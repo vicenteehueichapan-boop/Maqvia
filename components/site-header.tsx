@@ -1,6 +1,8 @@
-import Link from "next/link";
-import { ArrowUpRight, LogIn, Menu } from "lucide-react";
 import { getChatGPTUser, chatGPTSignInPath } from "@/app/chatgpt-auth";
-import { Brand } from "@/components/brand";
-export async function SiteHeader(){const user=await getChatGPTUser();return <header className="sticky top-0 z-50 border-b border-[#ffffff12] bg-[#101313]/94 backdrop-blur-2xl"><div className="container-shell h-[74px] flex items-center justify-between gap-4"><Brand compact/><nav className="hidden lg:flex items-center gap-8 text-[13px] font-semibold text-[#b5bdb3]"><Link className="hover:text-[#eae9e2]" href="/buscar">Explorar maquinaria</Link><Link className="hover:text-[#eae9e2]" href="/#experiencia">Cómo funciona</Link><Link className="hover:text-[#eae9e2]" href="/#asistente">Crear mi vitrina</Link></nav><div className="flex items-center gap-1.5 sm:gap-3"><Link href={user?"/cuenta":chatGPTSignInPath("/cuenta")} className="inline-flex items-center gap-2 rounded-xl px-2 sm:px-3 h-10 text-sm font-semibold text-[#c5ccc1] hover:text-white hover:bg-[#ffffff0b]" aria-label={user?"Mi cuenta":"Ingresar"}><LogIn size={17}/><span className="hidden sm:inline">{user?"Mi cuenta":"Ingresar"}</span></Link><Link href="/publicar" className="hidden sm:inline-flex action-primary !px-4 !py-2.5 text-sm">Publicar <ArrowUpRight size={17}/></Link><details className="relative lg:hidden group"><summary aria-label="Abrir menú" className="list-none flex items-center justify-center w-10 h-10 rounded-xl border border-[#414b43] text-[#eae9e2] [&::-webkit-details-marker]:hidden"><Menu size={19}/></summary><nav className="absolute top-12 right-0 w-57 rounded-2xl border border-[#455147] bg-[#1d2522] p-2 shadow-2xl flex flex-col text-sm font-semibold"><Link href="/buscar" className="rounded-lg px-4 py-3 hover:bg-[#ffffff0d]">Explorar maquinaria</Link><Link href="/#experiencia" className="rounded-lg px-4 py-3 hover:bg-[#ffffff0d]">Cómo funciona</Link><Link href="/#asistente" className="rounded-lg px-4 py-3 hover:bg-[#ffffff0d]">Crear vitrina</Link><Link href="/publicar" className="rounded-lg px-4 py-3 text-[#b9d88b] hover:bg-[#ffffff0d]">Publicar maquinaria ↗</Link></nav></details></div></div></header>}
+import { SiteHeaderClient } from "@/components/site-header-client";
+
+export async function SiteHeader() {
+  const user = await getChatGPTUser();
+  return <SiteHeaderClient authenticated={Boolean(user)} signInHref={chatGPTSignInPath("/cuenta")} />;
+}
 
