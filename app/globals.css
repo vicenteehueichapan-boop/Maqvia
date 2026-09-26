@@ -12,3 +12,7 @@
 
 .hero-scrim{background:linear-gradient(90deg,#0a100eeb 0%,#0a100ed6 34%,#0a100e5e 67%,#0a100e1a 100%)}
 @media(max-width:767px){.hero-scrim{background:linear-gradient(180deg,#0a100ee8 0%,#0a100ecb 56%,#0a100e69 100%)}}
+
+.pathway-stage img{mask-image:linear-gradient(to bottom,transparent 0%,#000 11%,#000 73%,transparent 100%)}
+.pathway-stage:after{content:"";position:absolute;top:0;bottom:0;left:50%;width:90px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,#10131388,transparent);filter:blur(22px);pointer-events:none}
+@media(max-width:767px){.pathway-stage:after{display:none}.pathway-stage img{mask-image:linear-gradient(to bottom,transparent 0%,#000 10%,#000 75%,transparent 100%)}}
