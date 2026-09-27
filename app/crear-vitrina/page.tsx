@@ -10,7 +10,6 @@ import {
   MessageCircle,
   UserRound,
 } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProfileAssistantV2 } from "@/components/profile-assistant-v2";
 
@@ -45,7 +44,6 @@ const stages = [
 export default function CreateShowcasePage() {
   return (
     <main className="min-h-screen overflow-x-clip">
-      <SiteHeader />
       <section className="relative isolate overflow-hidden border-b border-[#ffffff17] bg-[#17201d]">
         <img
           src="/hero-telescopico.jpg"
@@ -64,9 +62,9 @@ export default function CreateShowcasePage() {
               para encontrarte en Santiago.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <a href="/publicar" className="action-primary text-sm">
+              <Link href="/publicar" className="action-primary text-sm">
                 Comenzar mi vitrina <ArrowUpRight size={17} />
-              </a>
+              </Link>
               <a href="#vista-previa" className="action-secondary text-sm">
                 Probar una vista previa <ArrowDown size={17} />
               </a>
@@ -120,6 +118,8 @@ export default function CreateShowcasePage() {
             <img
               src="/hero-maquinaria.webp"
               alt="Maquinaria de ejemplo para una vitrina de proveedor"
+              loading="lazy"
+              decoding="async"
               className="absolute inset-0 -z-20 h-full w-full object-cover"
             />
             <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#101513eb] via-transparent to-transparent" />
@@ -171,9 +171,9 @@ export default function CreateShowcasePage() {
               Tu primera vitrina es gratuita en esta etapa.
             </p>
           </div>
-          <a href="/publicar" className="action-primary text-sm">
+          <Link href="/publicar" className="action-primary text-sm">
             Ir al formulario de publicación <ArrowRight size={17} />
-          </a>
+          </Link>
         </div>
       </section>
       <SiteFooter />

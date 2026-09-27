@@ -27,6 +27,8 @@ export function ListingDetail({
             <img
               src={listing.images[0]}
               alt={listing.title}
+              loading="eager"
+              decoding="async"
               className="h-full w-full object-cover"
             />
           ) : (
@@ -47,6 +49,8 @@ export function ListingDetail({
                 key={`${src}-${index}`}
                 src={src}
                 alt={`Vista ${index + 2} de ${listing.title}`}
+                loading="lazy"
+                decoding="async"
                 className="aspect-[4/3] w-full rounded-xl border border-[#465548] object-cover"
               />
             ))}

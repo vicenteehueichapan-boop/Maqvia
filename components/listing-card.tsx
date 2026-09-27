@@ -16,6 +16,8 @@ export function ListingCard({ listing, inert = false, actions }: ListingCardProp
         <img
           src={listing.images[0]}
           alt={listing.title}
+          loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.035]"
         />
       ) : (

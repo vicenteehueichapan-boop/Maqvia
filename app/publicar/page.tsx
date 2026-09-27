@@ -1,7 +1,6 @@
 import { requireChatGPTUser } from "@/app/chatgpt-auth";
 import { findProviderByOwner, listProviderEquipment } from "@/lib/marketplace";
 import { PublishForm } from "@/components/publish-form";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
@@ -12,7 +11,6 @@ export default async function PublishPage() {
   const count = provider ? (await listProviderEquipment(provider.id)).length : 0;
   return (
     <main className="min-h-screen">
-      <SiteHeader />
       <div className="container-shell py-12 md:py-17">
         <div className="grid lg:grid-cols-[1fr_.55fr] gap-6 items-end">
           <div>

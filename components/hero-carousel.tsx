@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowRight, ArrowUpRight, MapPin, Search } from "lucide-react";
 const slides = [
   { src: "/hero-maquinaria.webp", alt: "Excavadora trabajando en un terreno de Santiago" },
@@ -16,6 +18,7 @@ const communes = [
   "San Bernardo",
 ];
 export function HeroCarousel() {
+  const router = useRouter();
   const [index, setIndex] = useState(0);
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -41,6 +44,8 @@ export function HeroCarousel() {
               (i === index ? "opacity-100" : "opacity-0")
             }
             loading={i === 0 ? "eager" : "lazy"}
+            decoding="async"
+            fetchPriority={i === 0 ? "high" : undefined}
           />
         ))}
       </div>
@@ -61,6 +66,15 @@ export function HeroCarousel() {
           <form
             action="/maquinaria"
             method="get"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const fields = new FormData(event.currentTarget);
+              const params = new URLSearchParams({
+                q: String(fields.get("q") || "").trim(),
+                comuna: String(fields.get("comuna") || ""),
+              });
+              router.push(`/maquinaria?${params}`);
+            }}
             className="mt-9 max-w-[720px] rounded-2xl border border-[#87918772] bg-[#151c1a]/95 backdrop-blur-xl p-2 grid sm:grid-cols-[1fr_185px_auto] gap-1 shadow-[0_20px_70px_#0008]"
           >
             <label className="px-3 py-2.5">
@@ -97,18 +111,18 @@ export function HeroCarousel() {
             </button>
           </form>
           <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-semibold">
-            <a
+            <Link
               href="/crear-vitrina"
               className="inline-flex items-center gap-2 text-[#e9eee3] hover:text-[#cfe7b8]"
             >
               ¿Tienes maquinaria? Publícala <ArrowUpRight size={16} />
-            </a>
-            <a
+            </Link>
+            <Link
               href="/como-funciona"
               className="inline-flex items-center gap-2 text-[#aebcad] hover:text-white"
             >
               Cómo funciona <ArrowDown size={16} />
-            </a>
+            </Link>
           </div>
         </div>
       </div>

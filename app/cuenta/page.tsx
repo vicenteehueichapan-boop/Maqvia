@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, LogOut, Plus, Search, UserRound } from "lucide-react";
 import { requireChatGPTUser, chatGPTSignOutPath } from "@/app/chatgpt-auth";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { findProviderByOwner, listProviderEquipment } from "@/lib/marketplace";
 export const dynamic = "force-dynamic";
@@ -11,7 +10,6 @@ export default async function AccountPage() {
   const count = provider ? (await listProviderEquipment(provider.id)).length : 0;
   return (
     <main className="min-h-screen">
-      <SiteHeader />
       <div className="container-shell py-13 md:py-18">
         <p className="eyebrow">Tu espacio en Maquinal</p>
         <h1 className="display mt-4 text-[clamp(3rem,5vw,5rem)]">

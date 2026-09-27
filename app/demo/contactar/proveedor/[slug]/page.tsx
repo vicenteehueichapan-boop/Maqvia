@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { InquiryForm } from "@/components/inquiry-form";
 import { demoProviders } from "@/lib/demo-fixtures";
@@ -18,7 +17,6 @@ export default async function DemoProviderInquiry({
   if (!provider) notFound();
   return (
     <main>
-      <SiteHeader />
       <div className="container-shell max-w-3xl py-12 md:py-20">
         <Link
           href={`/demo/proveedores/${slug}`}

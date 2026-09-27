@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { SiteHeader } from "@/components/site-header";
+import { PageContent } from "@/components/page-content";
 import "./globals.css";
 export const metadata: Metadata = {
   title: "Maquinal | Arriendo de maquinaria en Santiago",
@@ -9,7 +11,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es-CL">
-      <body>{children}</body>
+      <body>
+        <SiteHeader />
+        <PageContent>{children}</PageContent>
+      </body>
     </html>
   );
 }

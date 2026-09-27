@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Menu, UserRound, X } from "lucide-react";
 import { Brand } from "@/components/brand";
@@ -8,6 +9,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger, SheetClose } from "@/com
 
 type HeaderProps = { authenticated: boolean; signInHref: string };
 const navigation = [
+  { label: "Inicio", href: "/", match: "/" },
   { label: "Explorar maquinaria", href: "/maquinaria", match: "/maquinaria" },
   { label: "Cómo funciona", href: "/como-funciona", match: "/como-funciona" },
   { label: "Crear mi vitrina", href: "/crear-vitrina", match: "/crear-vitrina" },
@@ -45,39 +47,42 @@ export function SiteHeaderClient({ authenticated, signInHref }: HeaderProps) {
     <header className="site-header" data-home={home} data-scrolled={scrolled}>
       <div className="container-shell flex h-[74px] items-center justify-between gap-4">
         <Brand compact />
-        <nav aria-label="Navegación principal" className="hidden lg:flex items-center gap-8">
+        <nav
+          aria-label="Navegación principal"
+          className="hidden lg:flex items-center gap-5 xl:gap-8"
+        >
           {navigation.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               className="header-link"
               aria-current={isActive(item.match) ? "page" : undefined}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2 lg:ml-0">
           {authenticated ? (
-            <a
+            <Link
               href={accountHref}
               aria-current={pathname === "/cuenta" ? "page" : undefined}
               className="action-ghost header-auth-action text-sm"
             >
               <UserRound size={17} /> Mi cuenta
-            </a>
+            </Link>
           ) : (
             <a href={accountHref} target="_top" className="action-ghost header-auth-action text-sm">
               <UserRound size={17} /> Ingresar
             </a>
           )}
-          <a
+          <Link
             href="/publicar"
             aria-current={pathname === "/publicar" ? "page" : undefined}
             className="action-primary min-h-10! px-4! py-2! text-sm"
           >
             Publicar <ArrowUpRight size={16} />
-          </a>
+          </Link>
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
               <button
@@ -109,33 +114,33 @@ export function SiteHeaderClient({ authenticated, signInHref }: HeaderProps) {
               <nav aria-label="Navegación móvil" className="mt-3 flex flex-col">
                 {navigation.map((item) => (
                   <SheetClose asChild key={item.href}>
-                    <a
+                    <Link
                       href={item.href}
                       className="header-mobile-link"
                       aria-current={isActive(item.match) ? "page" : undefined}
                     >
                       {item.label}
                       <ArrowUpRight size={17} />
-                    </a>
+                    </Link>
                   </SheetClose>
                 ))}
                 <SheetClose asChild>
-                  <a
+                  <Link
                     href="/publicar"
                     className="header-mobile-link"
                     aria-current={pathname === "/publicar" ? "page" : undefined}
                   >
                     Publicar maquinaria
                     <ArrowUpRight size={17} />
-                  </a>
+                  </Link>
                 </SheetClose>
               </nav>
               <div className="mt-auto border-t border-[#ffffff16] pt-6">
                 {authenticated ? (
                   <SheetClose asChild>
-                    <a href="/cuenta" className="action-secondary w-full text-sm">
+                    <Link href="/cuenta" className="action-secondary w-full text-sm">
                       <UserRound size={17} /> Mi cuenta
-                    </a>
+                    </Link>
                   </SheetClose>
                 ) : (
                   <a href={accountHref} target="_top" className="action-secondary w-full text-sm">

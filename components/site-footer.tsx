@@ -16,18 +16,18 @@ export function SiteFooter() {
             <Link href="/maquinaria" className="hover:text-[#b9d88b]">
               Explorar
             </Link>
-            <a href="/como-funciona" className="hover:text-[#b9d88b]">
+            <Link href="/como-funciona" className="hover:text-[#b9d88b]">
               Cómo funciona
-            </a>
-            <a href="/crear-vitrina" className="hover:text-[#b9d88b]">
+            </Link>
+            <Link href="/crear-vitrina" className="hover:text-[#b9d88b]">
               Crear mi vitrina
-            </a>
+            </Link>
             <Link href="/demo/proveedores/andes-maquinarias-demo" className="hover:text-[#b9d88b]">
               Vitrina de ejemplo
             </Link>
-            <a href="/publicar" className="hover:text-[#b9d88b]">
+            <Link href="/publicar" className="hover:text-[#b9d88b]">
               Publicar <ArrowUpRight size={14} className="inline" />
-            </a>
+            </Link>
           </div>
         </div>
         <div className="mt-10 pt-5 border-t border-[#343f37] flex flex-col sm:flex-row sm:justify-between gap-3 text-xs text-[#879488]">

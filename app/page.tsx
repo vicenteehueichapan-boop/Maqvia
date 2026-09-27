@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { HeroCarousel } from "@/components/hero-carousel";
 import { HomeExperience } from "@/components/home-experience";
@@ -30,7 +29,6 @@ const paths = [
 export default function Home() {
   return (
     <main className="min-h-screen overflow-x-clip">
-      <SiteHeader />
       <HeroCarousel />
       <section
         id="como-funciona"
@@ -60,6 +58,8 @@ export default function Home() {
                 <img
                   src={item.image}
                   alt={item.alt}
+                  loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.035]"
                 />
                 <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#101313fa] via-[#101313a6] to-[#10131322]" />

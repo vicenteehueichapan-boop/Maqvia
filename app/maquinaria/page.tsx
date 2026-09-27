@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, MapPin, Search } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CatalogGrid } from "@/components/catalog-grid";
 import { CatalogSavedActions } from "@/components/catalog-saved-actions";
+import { RouterGetForm } from "@/components/router-get-form";
 import { ListingCard } from "@/components/listing-card";
 import { getChatGPTUser, chatGPTSignInPath } from "@/app/chatgpt-auth";
 import { searchEquipment } from "@/lib/marketplace";
@@ -67,7 +67,6 @@ export default async function Buscar({
   );
   return (
     <main className="min-h-screen">
-      <SiteHeader />
       <section className="relative isolate overflow-hidden border-b border-[#405347] bg-[#171e1b]">
         <img
           src="/hero-cargador.jpg"
@@ -84,7 +83,8 @@ export default async function Buscar({
             Busca equipos y servicios por nombre o comuna. Abre cada ficha para conocer al
             proveedor.
           </p>
-          <form
+          <RouterGetForm
+            key={`search:${q}:${comuna}:${category}`}
             action="/maquinaria"
             className="mt-9 grid gap-2 rounded-2xl border border-[#8ea1847a] bg-[#1b2520]/95 p-2 shadow-[0_18px_70px_#0008] backdrop-blur-xl md:grid-cols-[1fr_230px_auto]"
           >
@@ -118,8 +118,12 @@ export default async function Buscar({
             <button className="action-primary text-sm">
               Buscar maquinaria <ArrowRight size={17} />
             </button>
-          </form>
-          <form action="/maquinaria" className="mt-4 flex flex-wrap items-center gap-3">
+          </RouterGetForm>
+          <RouterGetForm
+            key={`category:${q}:${comuna}:${category}`}
+            action="/maquinaria"
+            className="mt-4 flex flex-wrap items-center gap-3"
+          >
             <input type="hidden" name="q" value={q} />
             <input type="hidden" name="comuna" value={comuna} />
             <label htmlFor="catalog-category" className="text-xs font-bold text-[#d9e4d2]">
@@ -141,7 +145,7 @@ export default async function Buscar({
             <button className="rounded-xl border border-[#73836e] px-4 py-2.5 text-sm font-bold hover:border-[#b9d88b]">
               Aplicar filtro
             </button>
-          </form>
+          </RouterGetForm>
           <div className="mt-6 flex flex-wrap gap-2">
             {categories.map((category) => (
               <Link

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, LockKeyhole, MessageCircle } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ListingDetail } from "@/components/listing-detail";
 import { ListingCard } from "@/components/listing-card";
@@ -48,7 +47,6 @@ export default async function MachineryDetail({ params }: { params: Promise<{ sl
 
   return (
     <main className="min-h-screen">
-      <SiteHeader />
       <div className="container-shell py-10 md:py-13">
         <nav
           aria-label="Ruta de navegación"

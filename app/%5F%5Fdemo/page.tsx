@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ListingCard } from "@/components/listing-card";
 import { demoEquipment, demoProviders } from "@/lib/demo-fixtures";
@@ -10,7 +9,6 @@ export default function DemoLab() {
   if (process.env.NODE_ENV !== "development") notFound();
   return (
     <main>
-      <SiteHeader />
       <section className="container-shell py-14">
         <p className="eyebrow">Laboratorio visual · contenido ficticio</p>
         <h1 className="display mt-4 text-[clamp(3rem,5vw,5rem)]">Escenarios de Maquinal.</h1>

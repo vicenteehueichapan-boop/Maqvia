@@ -95,6 +95,8 @@ export function HomeEditorial() {
                   <img
                     src={guide.image}
                     alt="Fotografía ilustrativa de maquinaria"
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                   />
                 </div>

@@ -10,7 +10,6 @@ import {
   Search,
   ShieldCheck,
 } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
@@ -158,9 +157,9 @@ function GuideSection({
               </h3>
               <p className="mt-5 max-w-md text-base leading-relaxed text-[#d1d9cd]">{step.body}</p>
               <p className="mt-4 max-w-md text-sm leading-relaxed text-[#a5b3a4]">{step.detail}</p>
-              <a href={step.href} className="action-text mt-6 text-sm">
+              <Link href={step.href} className="action-text mt-6 text-sm">
                 {step.action} <ArrowUpRight size={17} />
-              </a>
+              </Link>
             </div>
             <div className={"space-y-4 " + (index % 2 ? "lg:order-1" : "")}>
               <figure className="guide-shot relative overflow-hidden rounded-[24px] border border-[#6673625c] bg-[#1b2320] shadow-[0_28px_90px_#0006]">
@@ -219,7 +218,6 @@ function GuideSection({
 export default function HowItWorksPage() {
   return (
     <main className="min-h-screen overflow-x-clip">
-      <SiteHeader />
       <section className="relative isolate overflow-hidden border-b border-[#ffffff16] bg-[#151b18]">
         <img
           src="/hero-cargador.jpg"
@@ -309,9 +307,9 @@ export default function HowItWorksPage() {
             <Link href="/maquinaria" className="action-secondary text-sm">
               Explorar maquinaria <ArrowRight size={17} />
             </Link>
-            <a href="/crear-vitrina" className="action-primary text-sm">
+            <Link href="/crear-vitrina" className="action-primary text-sm">
               Crear mi vitrina <ArrowUpRight size={17} />
-            </a>
+            </Link>
           </div>
         </div>
       </section>

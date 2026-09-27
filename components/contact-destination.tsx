@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowLeft, Check, MessageCircle, ShieldCheck } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { InquiryForm } from "@/components/inquiry-form";
 
@@ -17,7 +16,6 @@ export function ContactDestination({
 }) {
   return (
     <main className="min-h-screen">
-      <SiteHeader />
       <div className="container-shell max-w-4xl py-13 md:py-19">
         <Link
           href={back}

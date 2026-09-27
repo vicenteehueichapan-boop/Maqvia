@@ -8,6 +8,7 @@ Marketplace de arriendo de maquinaria para Santiago de Chile. El código se abre
 - `npm run dev` abre el sitio local en `http://localhost:5173`.
 - `npm run format:check`, `npm run lint`, `npx tsc --noEmit`, `node --experimental-strip-types --test tests/*.test.ts` y `npm run build` comprueban la entrega.
 - `/maquinaria` es el catálogo canónico; los filtros viajan en la URL.
+- El encabezado se comparte desde `app/layout.tsx`; Inicio, catálogo y guía navegan sin desmontarlo. La entrada de página dura 180 ms y se desactiva con movimiento reducido.
 - `/maquinaria/:slug` muestra tanto fichas reales como ejemplos claramente identificados.
 - `/crear-vitrina` permite probar la presentación antes de iniciar sesión; `/publicar` guía el registro y conserva un borrador local.
 - Las consultas reales requieren sesión y llevan a un mensaje revisable para WhatsApp. Maquinal no administra el arriendo ni el pago.

@@ -25,7 +25,7 @@
   --maquinal-radius-lg: 24px;
   --maquinal-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --maquinal-motion-fast: 160ms;
-  --maquinal-motion-base: 240ms;
+  --maquinal-motion-base: 180ms;
   --background: var(--maquinal-bg);
   --foreground: var(--maquinal-text);
   --card: var(--maquinal-surface);
@@ -83,6 +83,19 @@ body {
   color: var(--maquinal-text);
   font-family: "Manrope Variable", Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+.page-content {
+  animation: page-content-enter 180ms ease-out both;
+}
+@keyframes page-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 ::selection {
   background: var(--maquinal-accent);
@@ -335,6 +348,9 @@ summary:focus-visible {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .page-content {
+    animation: none;
+  }
   *,
   *:before,
   *:after {

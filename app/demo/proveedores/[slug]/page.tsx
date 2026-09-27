@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, LockKeyhole } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProviderShowcase } from "@/components/provider-showcase";
 import { demoProviders, equipmentForDemoProvider } from "@/lib/demo-fixtures";
@@ -16,7 +15,6 @@ export default async function DemoProviderPage({ params }: { params: Promise<{ s
   const user = await getChatGPTUser();
   return (
     <main className="min-h-screen">
-      <SiteHeader />
       <div className="container-shell py-10 md:py-13">
         <Link
           href="/maquinaria"
