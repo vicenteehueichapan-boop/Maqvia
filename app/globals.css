@@ -17,4 +17,5 @@
 
 .pathway-stage img{mask-image:linear-gradient(to bottom,transparent 0%,#000 11%,#000 73%,transparent 100%)}
 .pathway-stage:after{content:"";position:absolute;top:0;bottom:0;left:50%;width:90px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,#10131388,transparent);filter:blur(22px);pointer-events:none}
+.guide-shot i{display:block;width:7px;height:7px;border-radius:50%;background:#7a8d78}.guide-shot i:first-child{background:#b9d88b}.guide-shot i:nth-child(2){background:#c5a17f}.guide-section{scroll-margin-top:74px}
 @media(max-width:767px){.pathway-stage:after{display:none}.pathway-stage img{mask-image:linear-gradient(to bottom,transparent 0%,#000 10%,#000 75%,transparent 100%)}}
