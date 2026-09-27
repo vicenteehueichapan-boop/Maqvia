@@ -4,6 +4,8 @@ import { getDb } from "@/db";
 import { providers, equipment } from "@/db/schema";
 import { findProviderByOwner } from "@/lib/marketplace";
 import { eq } from "drizzle-orm";
+import { publicationSchema } from "@/lib/publication-validation";
+import { normalizeChileanWhatsApp } from "@/lib/contact-inquiry";
 
 function val(form:FormData,key:string,max:number){return String(form.get(key)||"").trim().slice(0,max)}
 function slugify(s:string){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,48)||"proveedor"}
@@ -11,7 +13,10 @@ export async function POST(request:Request){
  const user=await getChatGPTUser();if(!user)return Response.json({error:"Inicia sesión para publicar."},{status:401});
  try{
   const form=await request.formData();const name=val(form,"name",90),description=val(form,"description",600),comuna=val(form,"comuna",80),phone=val(form,"whatsapp",30),title=val(form,"title",100),category=val(form,"category",70),details=val(form,"details",800);
-  const cleanPhone=phone.replace(/\D/g,"");if(!name||!description||!comuna||!title||!category||!details||!/^56[0-9]{9}$/.test(cleanPhone))return Response.json({error:"Completa todos los datos y usa un WhatsApp chileno en formato +56 9 XXXX XXXX."},{status:400});
+  const parsed=publicationSchema.safeParse({name,description,comuna,whatsapp:phone,title,category,details,operator:form.get("operator"),delivery:form.get("delivery")});
+  if(!parsed.success)return Response.json({error:parsed.error.issues[0]?.message||"Revisa los datos de la publicación."},{status:400});
+  const cleanPhone=normalizeChileanWhatsApp(phone);
+  if(!cleanPhone)return Response.json({error:"Ingresa un WhatsApp chileno válido."},{status:400});
   const uploads=form.getAll("images").filter((x):x is File=>x instanceof File&&x.size>0);if(uploads.length<1||uploads.length>4)return Response.json({error:"Sube entre 1 y 4 fotos de la máquina."},{status:400});
   const types:Record<string,string>={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"};for(const file of uploads){if(!types[file.type]||file.size>5_000_000)return Response.json({error:"Las fotos deben ser JPG, PNG o WebP y pesar menos de 5 MB cada una."},{status:400})}
   if(!env.BUCKET)return Response.json({error:"El almacenamiento de imágenes no está disponible."},{status:503});

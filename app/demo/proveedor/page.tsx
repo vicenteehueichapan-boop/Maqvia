@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, Check, MapPin, MessageCircle, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check, MapPin, ShieldCheck } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { demoEquipment, demoProvider } from "@/lib/demo";
