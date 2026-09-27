@@ -1,3 +1,27 @@
+# Maquinal
+
+Marketplace de arriendo de maquinaria para Santiago de Chile. El código se abre directamente en Visual Studio Code desde esta carpeta.
+
+## Producto local
+
+- `npm install` instala las dependencias.
+- `npm run dev` abre el sitio local en `http://localhost:5173`.
+- `npm run format:check`, `npm run lint`, `npx tsc --noEmit`, `node --experimental-strip-types --test tests/*.test.ts` y `npm run build` comprueban la entrega.
+- `/maquinaria` es el catálogo canónico; los filtros viajan en la URL.
+- `/maquinaria/:slug` muestra tanto fichas reales como ejemplos claramente identificados.
+- `/crear-vitrina` permite probar la presentación antes de iniciar sesión; `/publicar` guía el registro y conserva un borrador local.
+- Las consultas reales requieren sesión y llevan a un mensaje revisable para WhatsApp. Maquinal no administra el arriendo ni el pago.
+
+Los ejemplos ficticios viven en `lib/demo-fixtures.ts`; sus imágenes están en `public/demo/`. No representan inventario disponible. La ruta `/__demo` es un laboratorio solo en desarrollo. Los favoritos y las búsquedas guardadas se almacenan en el navegador y todavía no se sincronizan. Las alertas de nuevas coincidencias y la ubicación exacta de proveedores reales requieren desarrollo adicional antes de ofrecerse.
+
+El mapa de ubicación exacta solo aparece en un ejemplo ficticio y se carga al solicitarlo; los proveedores reales pueden indicar comuna o sector aproximado. Antes de usar mapas de forma comercial a escala, debe elegirse un servicio con capacidad y condiciones adecuadas. Véase la [política de mosaicos de OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/).
+
+## Base técnica
+
+El proyecto mantiene el stack Vinext, Cloudflare D1 y R2 de la plantilla original. Las migraciones SQL nuevas están en `drizzle/` y deben aplicarse en orden en cada entorno. No se ha publicado esta rama.
+
+---
+
 # vinext-starter
 
 A clean full-stack starter running on [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and Drizzle support.
