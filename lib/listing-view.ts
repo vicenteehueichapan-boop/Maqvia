@@ -1,6 +1,7 @@
 import type { Equipment, PublicProvider } from "@/lib/marketplace";
 import { imageUrls } from "@/lib/image-urls";
 import type { DemoEquipment, DemoProvider } from "@/lib/demo-fixtures";
+import { serviceOffersSchema, visibleServiceNotes, type ServiceOffer } from "@/lib/service-offers";
 
 export type ListingView = {
   id: string;
@@ -14,6 +15,7 @@ export type ListingView = {
   operator?: string;
   delivery?: string;
   services: string[];
+  serviceOffers?: ServiceOffer[];
   location: "none" | "approx" | "exact-demo";
   sector?: string;
   specs?: string[];
@@ -47,10 +49,16 @@ export function demoListing(item: DemoEquipment, provider: DemoProvider): Listin
 }
 export function realListing(item: Equipment, provider: PublicProvider): ListingView {
   let services: string[] = [];
+  let serviceOffers: ServiceOffer[] = [];
   try {
     const parsed: unknown = JSON.parse(item.services);
-    if (Array.isArray(parsed))
+    if (Array.isArray(parsed)) {
       services = parsed.filter((value): value is string => typeof value === "string");
+      const offers = serviceOffersSchema.safeParse(
+        parsed.filter((value) => value && typeof value === "object"),
+      );
+      if (offers.success) serviceOffers = offers.data;
+    }
   } catch (error) {
     console.warn("No pudimos leer los servicios de una publicación.", error);
   }
@@ -75,9 +83,16 @@ export function realListing(item: Equipment, provider: PublicProvider): ListingV
     images: imageUrls(item.images),
     description: item.description,
     priceLabel,
-    operator: item.operator === "yes" ? "A consultar" : undefined,
-    delivery: item.delivery === "yes" ? "A consultar" : undefined,
-    services,
+    operator:
+      item.operator === "yes" && !serviceOffers.some((offer) => offer.name === "Operador")
+        ? "A consultar"
+        : undefined,
+    delivery:
+      item.delivery === "yes" && !serviceOffers.some((offer) => offer.name === "Traslado")
+        ? "A consultar"
+        : undefined,
+    services: visibleServiceNotes(services, serviceOffers),
+    serviceOffers,
     location: item.locationPrecision === "approx" ? "approx" : "none",
     sector: item.sector || undefined,
     providerName: provider.name,

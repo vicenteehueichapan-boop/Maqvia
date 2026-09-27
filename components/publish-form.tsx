@@ -21,6 +21,12 @@ import {
 import { publicationSchema, type PublicationValues } from "@/lib/publication-validation";
 import { normalizeChileanWhatsApp } from "@/lib/contact-inquiry";
 import {
+  readServiceOffersDraft,
+  serviceNames,
+  type ServiceName,
+  type ServiceOffer,
+} from "@/lib/service-offers";
+import {
   clearAssistantHandoff,
   clearPublicationDraft,
   readAssistantHandoff,
@@ -74,6 +80,7 @@ const stepFields: Partial<Record<number, Field[]>> = {
   0: ["name", "whatsapp", "comuna", "description"],
   1: ["title", "category", "details"],
   3: ["priceAmount"],
+  4: ["serviceOffers"],
 };
 
 function initialValues(provider: ExistingProvider): PublicationValues {
@@ -91,6 +98,7 @@ function initialValues(provider: ExistingProvider): PublicationValues {
     priceAmount: "",
     priceUnit: "day",
     services: "",
+    serviceOffers: "",
     sector: "",
     locationPrecision: "none",
     presentationVariant: "editorial",
@@ -162,6 +170,13 @@ export function PublishForm({ provider }: { provider: ExistingProvider }) {
   const [fromAssistant, setFromAssistant] = useState(false);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [step, setStep] = useState(0);
+  const selectedOffers = readServiceOffersDraft(values.serviceOffers);
+  if (!values.serviceOffers) {
+    if (values.operator === "yes" && !selectedOffers.some((offer) => offer.name === "Operador"))
+      selectedOffers.push({ name: "Operador", kind: "consult" });
+    if (values.delivery === "yes" && !selectedOffers.some((offer) => offer.name === "Traslado"))
+      selectedOffers.push({ name: "Traslado", kind: "consult" });
+  }
   const parsed = publicationSchema.safeParse(values);
   const errors = parsed.success
     ? {}
@@ -223,6 +238,25 @@ export function PublishForm({ provider }: { provider: ExistingProvider }) {
 
   function update(field: Field, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
+    setError("");
+    setSaveState("saving");
+  }
+  function setServiceOffer(name: ServiceName, offer: ServiceOffer | null) {
+    setValues((current) => {
+      const existing = readServiceOffersDraft(current.serviceOffers);
+      if (!current.serviceOffers) {
+        if (current.operator === "yes") existing.push({ name: "Operador", kind: "consult" });
+        if (current.delivery === "yes") existing.push({ name: "Traslado", kind: "consult" });
+      }
+      const next = existing.filter((item) => item.name !== name);
+      if (offer) next.push(offer);
+      return {
+        ...current,
+        serviceOffers: JSON.stringify(next),
+        operator: name === "Operador" ? (offer ? "yes" : "no") : current.operator,
+        delivery: name === "Traslado" ? (offer ? "yes" : "no") : current.delivery,
+      };
+    });
     setError("");
     setSaveState("saving");
   }
@@ -329,6 +363,7 @@ export function PublishForm({ provider }: { provider: ExistingProvider }) {
       priceAmount: true,
       priceUnit: true,
       services: true,
+      serviceOffers: true,
       sector: true,
       locationPrecision: true,
       presentationVariant: true,
@@ -569,30 +604,6 @@ export function PublishForm({ provider }: { provider: ExistingProvider }) {
               />
               {issue("details")}
             </label>
-            <label className="block text-sm font-semibold" data-publish-step="4">
-              ¿Incluye operador?
-              <select
-                name="operator"
-                value={values.operator}
-                onChange={(event) => update("operator", event.target.value)}
-                className="field mt-2"
-              >
-                <option value="no">No / a consultar</option>
-                <option value="yes">Sí, a consultar</option>
-              </select>
-            </label>
-            <label className="block text-sm font-semibold" data-publish-step="4">
-              ¿Ofreces traslado?
-              <select
-                name="delivery"
-                value={values.delivery}
-                onChange={(event) => update("delivery", event.target.value)}
-                className="field mt-2"
-              >
-                <option value="no">No / a consultar</option>
-                <option value="yes">Sí, a consultar</option>
-              </select>
-            </label>
             <label className="block text-sm font-semibold" data-publish-step="3">
               Precio
               <select
@@ -639,8 +650,89 @@ export function PublishForm({ provider }: { provider: ExistingProvider }) {
                 </label>
               </>
             )}
+            <fieldset className="md:col-span-2" data-publish-step="4">
+              <legend className="text-sm font-semibold">Servicios opcionales</legend>
+              <p className="mt-1 text-xs text-[#a9b7a6]">
+                Selecciona solo lo que realmente ofreces e indica cómo se cobra cada servicio.
+              </p>
+              <div className="mt-4 space-y-3">
+                {serviceNames.map((name) => {
+                  const offer = selectedOffers.find((item) => item.name === name);
+                  return (
+                    <div
+                      key={name}
+                      className="grid gap-3 rounded-xl border border-[#435447] bg-[#1b261f] p-4 sm:grid-cols-[1fr_190px_160px] sm:items-center"
+                    >
+                      <label className="flex items-center gap-3 text-sm font-semibold">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(offer)}
+                          onChange={(event) =>
+                            setServiceOffer(
+                              name,
+                              event.target.checked ? { name, kind: "consult" } : null,
+                            )
+                          }
+                          className="accent-[#b9d88b]"
+                        />
+                        {name}
+                      </label>
+                      {offer ? (
+                        <>
+                          <label className="text-xs text-[#b7c7b2]">
+                            Modalidad
+                            <select
+                              aria-label={`Modalidad de ${name}`}
+                              value={offer.kind}
+                              onChange={(event) => {
+                                const kind = event.target.value as ServiceOffer["kind"];
+                                setServiceOffer(name, {
+                                  name,
+                                  kind,
+                                  amount:
+                                    kind === "fixed" || kind === "from" ? offer.amount : undefined,
+                                });
+                              }}
+                              className="field mt-1"
+                            >
+                              <option value="consult">A consultar</option>
+                              <option value="included">Incluido</option>
+                              <option value="fixed">Precio fijo</option>
+                              <option value="from">Desde</option>
+                            </select>
+                          </label>
+                          {offer.kind === "fixed" || offer.kind === "from" ? (
+                            <label className="text-xs text-[#b7c7b2]">
+                              Monto en pesos
+                              <input
+                                aria-label={`Monto de ${name}`}
+                                inputMode="numeric"
+                                value={offer.amount ?? ""}
+                                onChange={(event) => {
+                                  const raw = event.target.value.trim();
+                                  setServiceOffer(name, {
+                                    name,
+                                    kind: offer.kind,
+                                    amount: /^\d+$/.test(raw) ? Number(raw) : undefined,
+                                  });
+                                }}
+                                placeholder="Ej. 40000"
+                                className="field mt-1"
+                              />
+                            </label>
+                          ) : (
+                            <span className="hidden sm:block" />
+                          )}
+                        </>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+              {issue("serviceOffers")}
+            </fieldset>
             <label className="block text-sm font-semibold md:col-span-2" data-publish-step="4">
-              Servicios y condiciones (separa con comas)
+              Otras condiciones (opcional, separa con comas)
               <input
                 name="services"
                 value={values.services}

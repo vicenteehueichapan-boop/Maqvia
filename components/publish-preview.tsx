@@ -5,6 +5,7 @@ import { ListingDetail } from "@/components/listing-detail";
 import { ProviderShowcase } from "@/components/provider-showcase";
 import type { ListingView, ProviderView } from "@/lib/listing-view";
 import type { PublicationValues } from "@/lib/publication-validation";
+import { readServiceOffersDraft, visibleServiceNotes } from "@/lib/service-offers";
 
 export function PublishPreview({
   values,
@@ -22,6 +23,7 @@ export function PublishPreview({
     values.priceKind === "consult" || !Number.isFinite(price) || price <= 0
       ? "Consultar precio"
       : `${values.priceKind === "from" ? "Desde " : ""}${new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(price)} / ${unit}`;
+  const serviceOffers = readServiceOffersDraft(values.serviceOffers);
   const listing: ListingView = {
     id: "borrador",
     title: values.title || "Tu maquinaria o servicio",
@@ -30,12 +32,22 @@ export function PublishPreview({
     images,
     description: values.details || undefined,
     priceLabel,
-    operator: values.operator === "yes" ? "A consultar" : undefined,
-    delivery: values.delivery === "yes" ? "A consultar" : undefined,
-    services: values.services
-      .split(",")
-      .map((value) => value.trim())
-      .filter(Boolean),
+    operator:
+      values.operator === "yes" && !serviceOffers.some((offer) => offer.name === "Operador")
+        ? "A consultar"
+        : undefined,
+    delivery:
+      values.delivery === "yes" && !serviceOffers.some((offer) => offer.name === "Traslado")
+        ? "A consultar"
+        : undefined,
+    services: visibleServiceNotes(
+      values.services
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean),
+      serviceOffers,
+    ),
+    serviceOffers,
     location: values.locationPrecision === "approx" ? "approx" : "none",
     sector: values.sector || undefined,
     providerName: values.name || "Tu negocio",

@@ -3,6 +3,7 @@ import { ArrowUpRight, MapPin, Truck } from "lucide-react";
 import { LocationPanel } from "@/components/location-panel";
 import type { ReactNode } from "react";
 import type { ListingView } from "@/lib/listing-view";
+import { serviceOfferLabel } from "@/lib/service-offers";
 
 export function ListingDetail({
   listing,
@@ -114,6 +115,22 @@ export function ListingDetail({
                 </p>
               </div>
             )}
+          </div>
+        ) : null}
+        {listing.serviceOffers?.length ? (
+          <div className="mt-7">
+            <h2 className="text-sm font-bold">Servicios disponibles</h2>
+            <div className="mt-3 divide-y divide-[#405042] border-y border-[#405042]">
+              {listing.serviceOffers.map((offer) => (
+                <div
+                  key={offer.name}
+                  className="flex items-center justify-between gap-4 py-3 text-sm"
+                >
+                  <span className="text-[#d9e3d4]">{offer.name}</span>
+                  <strong className="text-right text-[#d5e9c4]">{serviceOfferLabel(offer)}</strong>
+                </div>
+              ))}
+            </div>
           </div>
         ) : null}
         {listing.services.length > 0 && (

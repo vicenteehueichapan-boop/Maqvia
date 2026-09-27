@@ -10,10 +10,10 @@ Marketplace de arriendo de maquinaria para Santiago de Chile. El código se abre
 - `/maquinaria` es el catálogo canónico; los filtros viajan en la URL.
 - El encabezado se comparte desde `app/layout.tsx`; Inicio, catálogo y guía navegan sin desmontarlo. La entrada de página dura 180 ms y se desactiva con movimiento reducido.
 - `/maquinaria/:slug` muestra tanto fichas reales como ejemplos claramente identificados.
-- `/crear-vitrina` permite probar la presentación antes de iniciar sesión; `/publicar` guía el registro y conserva un borrador local.
+- `/crear-vitrina` permite probar la presentación antes de iniciar sesión; `/publicar` guía el registro, conserva un borrador local y permite indicar modalidad y monto por servicio opcional.
 - Las consultas reales requieren sesión y llevan a un mensaje revisable para WhatsApp. Maquinal no administra el arriendo ni el pago.
 
-Los ejemplos ficticios viven en `lib/demo-fixtures.ts`; sus imágenes están en `public/demo/`. No representan inventario disponible. La ruta `/__demo` es un laboratorio solo en desarrollo. Los favoritos y las búsquedas guardadas se almacenan en el navegador y todavía no se sincronizan. Las alertas de nuevas coincidencias, la ubicación exacta de proveedores reales y los precios individuales de servicios requieren desarrollo adicional antes de ofrecerse.
+Los ejemplos ficticios viven en `lib/demo-fixtures.ts`; sus imágenes están en `public/demo/`. No representan inventario disponible. La ruta `/__demo` es un laboratorio solo en desarrollo. Los favoritos y las búsquedas guardadas se almacenan en el navegador y todavía no se sincronizan. Las alertas de nuevas coincidencias y la ubicación exacta de proveedores reales requieren desarrollo adicional antes de ofrecerse.
 
 El mapa de ubicación exacta solo aparece en un ejemplo ficticio y se carga al solicitarlo; los proveedores reales pueden indicar comuna o sector aproximado. Antes de usar mapas de forma comercial a escala, debe elegirse un servicio con capacidad y condiciones adecuadas. Véase la [política de mosaicos de OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/).
 

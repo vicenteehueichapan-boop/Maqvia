@@ -6,6 +6,7 @@ import { findProviderByOwner } from "@/lib/marketplace";
 import { eq } from "drizzle-orm";
 import { publicationSchema } from "@/lib/publication-validation";
 import { normalizeChileanWhatsApp } from "@/lib/contact-inquiry";
+import { parseServiceOffers } from "@/lib/service-offers";
 
 function val(form: FormData, key: string, max: number) {
   return String(form.get(key) || "")
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
       priceAmount: val(form, "priceAmount", 10),
       priceUnit: val(form, "priceUnit", 10) || undefined,
       services: val(form, "services", 300),
+      serviceOffers: val(form, "serviceOffers", 700),
       sector: val(form, "sector", 80),
       locationPrecision: val(form, "locationPrecision", 10) || undefined,
       presentationVariant: val(form, "presentationVariant", 10) || undefined,
@@ -124,13 +126,14 @@ export async function POST(request: Request) {
       priceKind: parsed.data.priceKind,
       priceAmount: parsed.data.priceKind === "consult" ? null : Number(parsed.data.priceAmount),
       priceUnit: parsed.data.priceUnit,
-      services: JSON.stringify(
-        parsed.data.services
+      services: JSON.stringify([
+        ...parsed.data.services
           .split(",")
           .map((value) => value.trim())
           .filter(Boolean)
           .slice(0, 8),
-      ),
+        ...(parseServiceOffers(parsed.data.serviceOffers) || []),
+      ]),
       sector: parsed.data.sector,
       locationPrecision: parsed.data.locationPrecision,
       presentationVariant: parsed.data.presentationVariant,

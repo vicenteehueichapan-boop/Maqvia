@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { normalizeChileanWhatsApp } from "./contact-inquiry.ts";
+import { parseServiceOffers } from "./service-offers.ts";
 
 export const publicationSchema = z
   .object({
@@ -37,6 +38,7 @@ export const publicationSchema = z
     priceAmount: z.string().trim().max(10).default(""),
     priceUnit: z.enum(["day", "hour", "week", "month", "service"]).default("day"),
     services: z.string().trim().max(300).default(""),
+    serviceOffers: z.string().trim().max(700).default(""),
     sector: z.string().trim().max(80).default(""),
     locationPrecision: z.enum(["none", "approx"]).default("none"),
     presentationVariant: z.enum(["editorial", "visual", "technical"]).default("editorial"),
@@ -56,6 +58,12 @@ export const publicationSchema = z
         code: "custom",
         path: ["comuna"],
         message: "Selecciona una comuna para mostrar la ubicación aproximada.",
+      });
+    if (parseServiceOffers(value.serviceOffers) === null)
+      context.addIssue({
+        code: "custom",
+        path: ["serviceOffers"],
+        message: "Revisa el precio de los servicios seleccionados.",
       });
   });
 

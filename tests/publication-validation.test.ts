@@ -6,6 +6,11 @@ import {
   publicationSchema,
   serviceSchema,
 } from "../lib/publication-validation.ts";
+import {
+  parseServiceOffers,
+  serviceOfferLabel,
+  visibleServiceNotes,
+} from "../lib/service-offers.ts";
 
 test("precio a consultar no exige monto", () => {
   assert.equal(priceSchema.safeParse({ kind: "consult" }).success, true);
@@ -63,6 +68,32 @@ test("servicio inactivo no exige precio", () => {
   );
 });
 
+test("servicios opcionales conservan modalidad y validan montos", () => {
+  const offers = parseServiceOffers(
+    JSON.stringify([
+      { name: "Operador", kind: "included" },
+      { name: "Traslado", kind: "from", amount: 40000 },
+    ]),
+  );
+  assert.ok(offers);
+  assert.equal(serviceOfferLabel(offers[0]), "Incluido");
+  assert.equal(serviceOfferLabel(offers[1]), "Desde $40.000");
+  assert.deepEqual(
+    visibleServiceNotes(
+      ["Operador disponible", "Traslado a consultar", "Casco obligatorio"],
+      offers,
+    ),
+    ["Casco obligatorio"],
+  );
+  assert.equal(parseServiceOffers('[{"name":"Traslado","kind":"fixed"}]'), null);
+  assert.equal(
+    parseServiceOffers(
+      '[{"name":"Operador","kind":"consult"},{"name":"Operador","kind":"included"}]',
+    ),
+    null,
+  );
+});
+
 test("publicación valida título y WhatsApp en el mismo esquema del servidor", () => {
   const base = {
     name: "Andes Maquinarias",
@@ -78,4 +109,11 @@ test("publicación valida título y WhatsApp en el mismo esquema del servidor", 
   assert.equal(publicationSchema.safeParse(base).success, true);
   assert.equal(publicationSchema.safeParse({ ...base, title: "abc" }).success, false);
   assert.equal(publicationSchema.safeParse({ ...base, whatsapp: "123" }).success, false);
+  assert.equal(
+    publicationSchema.safeParse({
+      ...base,
+      serviceOffers: '[{"name":"Traslado","kind":"from"}]',
+    }).success,
+    false,
+  );
 });
