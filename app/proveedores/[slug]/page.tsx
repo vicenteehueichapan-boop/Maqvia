@@ -1,10 +1,47 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, Check, LockKeyhole, MapPin, MessageCircle } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, LockKeyhole, MessageCircle } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { EquipmentCard } from "@/components/equipment-card";
+import { ProviderShowcase } from "@/components/provider-showcase";
 import { findProviderBySlug, listProviderEquipment } from "@/lib/marketplace";
+import { realListing, realProviderView } from "@/lib/listing-view";
 import { getChatGPTUser } from "@/app/chatgpt-auth";
-export const dynamic="force-dynamic";
-export default async function ProviderPage({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const provider=await findProviderBySlug(slug);if(!provider)notFound();const items=await listProviderEquipment(provider.id);const user=await getChatGPTUser();return <main className="min-h-screen"><SiteHeader/><div className="container-shell py-10 md:py-13"><Link href="/buscar" className="inline-flex gap-2 items-center text-sm text-[#aeb9aa] hover:text-white"><ArrowLeft size={16}/> Volver al catálogo</Link><section className="mt-8 rounded-[28px] premium-panel relative overflow-hidden p-7 md:p-12 ambient-warm"><div className="relative grid lg:grid-cols-[1fr_auto] gap-8 items-end"><div><p className="eyebrow">Vitrina del proveedor · Santiago</p><h1 className="display mt-4 text-[clamp(2.8rem,5vw,5rem)]">{provider.name}</h1><p className="muted-copy mt-5 max-w-2xl">{provider.description}</p><p className="mt-6 inline-flex items-center gap-2 text-sm text-[#c5d1c0]"><MapPin size={17}/>{provider.comuna}, Región Metropolitana</p></div><Link href={"/contactar/proveedor/"+encodeURIComponent(slug)} className="action-primary shrink-0 text-sm">{user?<MessageCircle size={18}/>:<LockKeyhole size={18}/>} {user?"Consultar al proveedor":"Ingresar para consultar"} <ArrowUpRight size={17}/></Link></div></section><section className="mt-15 grid lg:grid-cols-[.3fr_1fr] gap-8 lg:gap-13"><aside><p className="eyebrow">Qué encontrarás aquí</p><h2 className="mt-3 text-2xl font-bold tracking-[-.04em]">Equipos de este proveedor.</h2><p className="muted-copy mt-4 text-sm">Abre cada ficha para conocer características, fotos y opciones de traslado u operador.</p><p className="mt-6 inline-flex gap-2 items-center text-xs text-[#aec0ab]"><Check size={16} className="text-[#b9d88b]"/> Trato directo con quien publica</p></aside><div><div className="flex items-end justify-between gap-3 mb-6"><div><p className="eyebrow">Catálogo del proveedor</p><h2 className="mt-2 text-3xl font-bold tracking-[-.05em]">Equipos y servicios</h2></div><span className="text-xs text-[#9fae9e]">{items.length} {items.length===1?"publicación":"publicaciones"}</span></div>{items.length?<div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">{items.map(item=><EquipmentCard key={item.id} item={item} provider={provider}/>)}</div>:<p className="rounded-2xl premium-surface p-7 text-[#a8b7a4]">Este proveedor todavía no publica equipos.</p>}</div></section></div><SiteFooter/></main>}
+export const dynamic = "force-dynamic";
+export default async function ProviderPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const provider = await findProviderBySlug(slug);
+  if (!provider) notFound();
+  const items = await listProviderEquipment(provider.id);
+  const user = await getChatGPTUser();
+  return (
+    <main className="min-h-screen">
+      <SiteHeader />
+      <div className="container-shell py-10 md:py-13">
+        <Link
+          href="/maquinaria"
+          className="inline-flex items-center gap-2 text-sm text-[#aeb9aa] hover:text-white"
+        >
+          <ArrowLeft size={16} /> Volver al catálogo
+        </Link>
+        <div className="mt-8">
+          <ProviderShowcase
+            provider={realProviderView(provider)}
+            listings={items.map((item) => realListing(item, provider))}
+            contact={
+              <Link
+                href={"/contactar/proveedor/" + encodeURIComponent(slug)}
+                className="action-primary shrink-0 text-sm"
+              >
+                {user ? <MessageCircle size={18} /> : <LockKeyhole size={18} />}{" "}
+                {user ? "Consultar al proveedor" : "Ingresar para consultar"}{" "}
+                <ArrowUpRight size={17} />
+              </Link>
+            }
+          />
+        </div>
+      </div>
+      <SiteFooter />
+    </main>
+  );
+}

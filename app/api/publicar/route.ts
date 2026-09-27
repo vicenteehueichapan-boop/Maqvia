@@ -7,24 +7,144 @@ import { eq } from "drizzle-orm";
 import { publicationSchema } from "@/lib/publication-validation";
 import { normalizeChileanWhatsApp } from "@/lib/contact-inquiry";
 
-function val(form:FormData,key:string,max:number){return String(form.get(key)||"").trim().slice(0,max)}
-function slugify(s:string){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,48)||"proveedor"}
-export async function POST(request:Request){
- const user=await getChatGPTUser();if(!user)return Response.json({error:"Inicia sesión para publicar."},{status:401});
- try{
-  const form=await request.formData();const name=val(form,"name",90),description=val(form,"description",600),comuna=val(form,"comuna",80),phone=val(form,"whatsapp",30),title=val(form,"title",100),category=val(form,"category",70),details=val(form,"details",800);
-  const parsed=publicationSchema.safeParse({name,description,comuna,whatsapp:phone,title,category,details,operator:form.get("operator"),delivery:form.get("delivery")});
-  if(!parsed.success)return Response.json({error:parsed.error.issues[0]?.message||"Revisa los datos de la publicación."},{status:400});
-  const cleanPhone=normalizeChileanWhatsApp(phone);
-  if(!cleanPhone)return Response.json({error:"Ingresa un WhatsApp chileno válido."},{status:400});
-  const uploads=form.getAll("images").filter((x):x is File=>x instanceof File&&x.size>0);if(uploads.length<1||uploads.length>4)return Response.json({error:"Sube entre 1 y 4 fotos de la máquina."},{status:400});
-  const types:Record<string,string>={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"};for(const file of uploads){if(!types[file.type]||file.size>5_000_000)return Response.json({error:"Las fotos deben ser JPG, PNG o WebP y pesar menos de 5 MB cada una."},{status:400})}
-  if(!env.BUCKET)return Response.json({error:"El almacenamiento de imágenes no está disponible."},{status:503});
-  const keys:string[]=[];for(const file of uploads){const key=crypto.randomUUID()+"."+types[file.type];await env.BUCKET.put(key,file.stream(),{httpMetadata:{contentType:file.type}});keys.push(key)}
-  const now=new Date().toISOString();const db=getDb();let provider=await findProviderByOwner(user.userId);
-  if(provider){await db.update(providers).set({name,description,comuna,whatsapp:cleanPhone,updatedAt:now}).where(eq(providers.id,provider.id))}
-  else{const id=crypto.randomUUID();const slug=slugify(name)+"-"+id.slice(0,6);provider={id,ownerId:user.userId,slug,name,description,comuna,whatsapp:cleanPhone,createdAt:now,updatedAt:now};await db.insert(providers).values(provider)}
-  const itemId=crypto.randomUUID();await db.insert(equipment).values({id:itemId,providerId:provider.id,title,category,description:details,images:JSON.stringify(keys),operator:form.get("operator")==="yes"?"yes":"no",delivery:form.get("delivery")==="yes"?"yes":"no",createdAt:now});
-  return Response.json({url:"/proveedores/"+provider.slug,itemUrl:"/equipos/"+itemId},{status:201});
- }catch(error){console.error("publish_error",error);return Response.json({error:"No pudimos guardar la publicación. Inténtalo nuevamente."},{status:500})}
+function val(form: FormData, key: string, max: number) {
+  return String(form.get(key) || "")
+    .trim()
+    .slice(0, max);
+}
+function slugify(s: string) {
+  return (
+    s
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 48) || "proveedor"
+  );
+}
+export async function POST(request: Request) {
+  const user = await getChatGPTUser();
+  if (!user) return Response.json({ error: "Inicia sesión para publicar." }, { status: 401 });
+  try {
+    const form = await request.formData();
+    const name = val(form, "name", 90),
+      description = val(form, "description", 600),
+      comuna = val(form, "comuna", 80),
+      phone = val(form, "whatsapp", 30),
+      title = val(form, "title", 100),
+      category = val(form, "category", 70),
+      details = val(form, "details", 800);
+    const parsed = publicationSchema.safeParse({
+      name,
+      description,
+      comuna,
+      whatsapp: phone,
+      title,
+      category,
+      details,
+      operator: form.get("operator"),
+      delivery: form.get("delivery"),
+      priceKind: val(form, "priceKind", 10) || undefined,
+      priceAmount: val(form, "priceAmount", 10),
+      priceUnit: val(form, "priceUnit", 10) || undefined,
+      services: val(form, "services", 300),
+      sector: val(form, "sector", 80),
+      locationPrecision: val(form, "locationPrecision", 10) || undefined,
+      presentationVariant: val(form, "presentationVariant", 10) || undefined,
+    });
+    if (!parsed.success)
+      return Response.json(
+        { error: parsed.error.issues[0]?.message || "Revisa los datos de la publicación." },
+        { status: 400 },
+      );
+    const cleanPhone = normalizeChileanWhatsApp(phone);
+    if (!cleanPhone)
+      return Response.json({ error: "Ingresa un WhatsApp chileno válido." }, { status: 400 });
+    const uploads = form.getAll("images").filter((x): x is File => x instanceof File && x.size > 0);
+    if (uploads.length < 1 || uploads.length > 4)
+      return Response.json({ error: "Sube entre 1 y 4 fotos de la máquina." }, { status: 400 });
+    const types: Record<string, string> = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+    };
+    for (const file of uploads) {
+      if (!types[file.type] || file.size > 5_000_000)
+        return Response.json(
+          { error: "Las fotos deben ser JPG, PNG o WebP y pesar menos de 5 MB cada una." },
+          { status: 400 },
+        );
+    }
+    if (!env.BUCKET)
+      return Response.json(
+        { error: "El almacenamiento de imágenes no está disponible." },
+        { status: 503 },
+      );
+    const keys: string[] = [];
+    for (const file of uploads) {
+      const key = crypto.randomUUID() + "." + types[file.type];
+      await env.BUCKET.put(key, file.stream(), { httpMetadata: { contentType: file.type } });
+      keys.push(key);
+    }
+    const now = new Date().toISOString();
+    const db = getDb();
+    let provider = await findProviderByOwner(user.userId);
+    if (provider) {
+      await db
+        .update(providers)
+        .set({ name, description, comuna, whatsapp: cleanPhone, updatedAt: now })
+        .where(eq(providers.id, provider.id));
+    } else {
+      const id = crypto.randomUUID();
+      const slug = slugify(name) + "-" + id.slice(0, 6);
+      provider = {
+        id,
+        ownerId: user.userId,
+        slug,
+        name,
+        description,
+        comuna,
+        whatsapp: cleanPhone,
+        createdAt: now,
+        updatedAt: now,
+      };
+      await db.insert(providers).values(provider);
+    }
+    const itemId = crypto.randomUUID();
+    await db.insert(equipment).values({
+      id: itemId,
+      providerId: provider.id,
+      title,
+      category,
+      description: details,
+      images: JSON.stringify(keys),
+      operator: parsed.data.operator,
+      delivery: parsed.data.delivery,
+      priceKind: parsed.data.priceKind,
+      priceAmount: parsed.data.priceKind === "consult" ? null : Number(parsed.data.priceAmount),
+      priceUnit: parsed.data.priceUnit,
+      services: JSON.stringify(
+        parsed.data.services
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean)
+          .slice(0, 8),
+      ),
+      sector: parsed.data.sector,
+      locationPrecision: parsed.data.locationPrecision,
+      presentationVariant: parsed.data.presentationVariant,
+      createdAt: now,
+    });
+    return Response.json(
+      { url: "/proveedores/" + provider.slug, itemUrl: "/maquinaria/" + itemId },
+      { status: 201 },
+    );
+  } catch (error) {
+    console.error("publish_error", error);
+    return Response.json(
+      { error: "No pudimos guardar la publicación. Inténtalo nuevamente." },
+      { status: 500 },
+    );
+  }
 }

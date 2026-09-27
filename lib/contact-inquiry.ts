@@ -17,12 +17,23 @@ export type Inquiry = z.infer<typeof inquirySchema>;
 
 export function normalizeChileanWhatsApp(value: string): string | null {
   const digits = value.replace(/\D/g, "");
-  const international = digits.startsWith("56") ? digits : digits.startsWith("9") ? `56${digits}` : "";
+  const international = digits.startsWith("56")
+    ? digits
+    : digits.startsWith("9")
+      ? `56${digits}`
+      : "";
   return /^569\d{8}$/.test(international) ? international : null;
 }
 
-export function buildInquiryMessage(subject: string, values: Inquiry, kind: "item" | "provider" = "item"): string {
-  const greeting = kind === "provider" ? "Hola, encontré tu vitrina en Maquinal." : `Hola, vi tu publicación “${subject.trim()}” en Maquinal.`;
+export function buildInquiryMessage(
+  subject: string,
+  values: Inquiry,
+  kind: "item" | "provider" = "item",
+): string {
+  const greeting =
+    kind === "provider"
+      ? "Hola, encontré tu vitrina en Maquinal."
+      : `Hola, vi tu publicación “${subject.trim()}” en Maquinal.`;
   const lines = [greeting, "", "Quisiera consultar:"];
   if (values.comuna.trim()) lines.push(`• Comuna: ${values.comuna.trim()}`);
   if (values.date) {

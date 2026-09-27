@@ -1,16 +1,117 @@
 "use client";
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowRight, ArrowUpRight, MapPin, Search } from "lucide-react";
-const slides=[
- {src:"/hero-maquinaria.webp",alt:"Excavadora trabajando en un terreno de Santiago"},
- {src:"/hero-cargador.jpg",alt:"Minicargador en una obra de construcción"},
- {src:"/hero-telescopico.jpg",alt:"Manipulador telescópico elevando materiales en una obra"}
+const slides = [
+  { src: "/hero-maquinaria.webp", alt: "Excavadora trabajando en un terreno de Santiago" },
+  { src: "/hero-cargador.jpg", alt: "Minicargador en una obra de construcción" },
+  { src: "/hero-telescopico.jpg", alt: "Manipulador telescópico elevando materiales en una obra" },
 ];
-const communes=["Santiago","Maipú","Pudahuel","Quilicura","Las Condes","Puente Alto","San Bernardo"];
-export function HeroCarousel(){const [index,setIndex]=useState(0);
-useEffect(()=>{if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;const timer=window.setInterval(()=>{if(document.visibilityState==="visible")setIndex(i=>(i+1)%slides.length)},6500);return()=>window.clearInterval(timer)},[]);
-return <section aria-label="Inicio de Maquinal" className="relative isolate min-h-[760px] md:min-h-[720px] flex items-center overflow-hidden bg-[#121714]">
-<div className="absolute inset-0 -z-20">{slides.map((slide,i)=><img key={slide.src} src={slide.src} alt={i===index?slide.alt:""} aria-hidden={i!==index} className={"absolute inset-0 w-full h-full object-cover object-[64%_center] md:object-center transition-opacity duration-[1400ms] "+(i===index?"opacity-100":"opacity-0")} loading={i===0?"eager":"lazy"}/>)}</div><div className="hero-scrim absolute inset-0 -z-10"/><div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#101313] to-transparent -z-10"/>
-<div className="container-shell relative z-10 pt-16 pb-40 md:py-24"><div className="max-w-[700px]"><p className="text-xs font-bold tracking-[.15em] uppercase text-[#c6d7b3]">Arriendo de maquinaria · Santiago</p><h1 className="mt-7 max-w-[720px] text-[clamp(3.2rem,6.1vw,6.1rem)] leading-[1.05] tracking-[-.062em] font-bold text-[#f4f2eb]">Encuentra la maquinaria que necesitas.</h1><p className="mt-6 max-w-[520px] text-base md:text-lg leading-relaxed text-[#d3d8d0]">Busca y compara equipos en Santiago. Conoce quién los ofrece y contacta directamente al proveedor.</p>
-<form action="/buscar" method="get" className="mt-9 max-w-[720px] rounded-2xl border border-[#87918772] bg-[#151c1a]/95 backdrop-blur-xl p-2 grid sm:grid-cols-[1fr_185px_auto] gap-1 shadow-[0_20px_70px_#0008]"><label className="px-3 py-2.5"><span className="block text-[11px] font-bold tracking-[.08em] text-[#acb8aa]">¿Qué equipo buscas?</span><span className="mt-1 flex gap-2 items-center"><Search size={18} className="text-[#b9d88b] shrink-0"/><input name="q" placeholder="Ej. miniexcavadora" className="w-full bg-transparent outline-none text-sm text-[#f4f2eb] placeholder:text-[#8e9e8e]"/></span></label><label className="px-3 py-2.5 border-t sm:border-t-0 sm:border-l border-[#4d5b50]"><span className="block text-[11px] font-bold tracking-[.08em] text-[#acb8aa]">Comuna</span><span className="mt-1 flex items-center gap-2"><MapPin size={17} className="text-[#b9d88b] shrink-0"/><select name="comuna" className="w-full bg-transparent text-sm outline-none"><option value="">Todo Santiago</option>{communes.map(c=><option key={c} value={c}>{c}</option>)}</select></span></label><button type="submit" className="action-primary !rounded-xl !px-6 min-h-12 text-sm">Buscar <ArrowRight size={18}/></button></form><div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-semibold"><a href="/crear-vitrina" className="inline-flex items-center gap-2 text-[#e9eee3] hover:text-[#cfe7b8]">¿Tienes maquinaria? Publícala <ArrowUpRight size={16}/></a><a href="/como-funciona" className="inline-flex items-center gap-2 text-[#aebcad] hover:text-white">Cómo funciona <ArrowDown size={16}/></a></div></div></div>
-</section>}
+const communes = [
+  "Santiago",
+  "Maipú",
+  "Pudahuel",
+  "Quilicura",
+  "Las Condes",
+  "Puente Alto",
+  "San Bernardo",
+];
+export function HeroCarousel() {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") setIndex((i) => (i + 1) % slides.length);
+    }, 6500);
+    return () => window.clearInterval(timer);
+  }, []);
+  return (
+    <section
+      aria-label="Inicio de Maquinal"
+      className="relative isolate min-h-[760px] md:min-h-[720px] flex items-center overflow-hidden bg-[#121714]"
+    >
+      <div className="absolute inset-0 -z-20">
+        {slides.map((slide, i) => (
+          <img
+            key={slide.src}
+            src={slide.src}
+            alt={i === index ? slide.alt : ""}
+            aria-hidden={i !== index}
+            className={
+              "absolute inset-0 w-full h-full object-cover object-[64%_center] md:object-center transition-opacity duration-[1400ms] " +
+              (i === index ? "opacity-100" : "opacity-0")
+            }
+            loading={i === 0 ? "eager" : "lazy"}
+          />
+        ))}
+      </div>
+      <div className="hero-scrim absolute inset-0 -z-10" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#101313] to-transparent -z-10" />
+      <div className="container-shell relative z-10 pt-16 pb-40 md:py-24">
+        <div className="max-w-[700px]">
+          <p className="text-xs font-bold tracking-[.15em] uppercase text-[#c6d7b3]">
+            Arriendo de maquinaria · Santiago
+          </p>
+          <h1 className="mt-7 max-w-[720px] text-[clamp(3.2rem,6.1vw,6.1rem)] leading-[1.05] tracking-[-.062em] font-bold text-[#f4f2eb]">
+            Encuentra la maquinaria que necesitas.
+          </h1>
+          <p className="mt-6 max-w-[520px] text-base md:text-lg leading-relaxed text-[#d3d8d0]">
+            Busca y compara equipos en Santiago. Conoce quién los ofrece y contacta directamente al
+            proveedor.
+          </p>
+          <form
+            action="/maquinaria"
+            method="get"
+            className="mt-9 max-w-[720px] rounded-2xl border border-[#87918772] bg-[#151c1a]/95 backdrop-blur-xl p-2 grid sm:grid-cols-[1fr_185px_auto] gap-1 shadow-[0_20px_70px_#0008]"
+          >
+            <label className="px-3 py-2.5">
+              <span className="block text-[11px] font-bold tracking-[.08em] text-[#acb8aa]">
+                ¿Qué necesitas?
+              </span>
+              <span className="mt-1 flex gap-2 items-center">
+                <Search size={18} className="text-[#b9d88b] shrink-0" />
+                <input
+                  name="q"
+                  placeholder="Ej. miniexcavadora"
+                  className="w-full bg-transparent outline-none text-sm text-[#f4f2eb] placeholder:text-[#8e9e8e]"
+                />
+              </span>
+            </label>
+            <label className="px-3 py-2.5 border-t sm:border-t-0 sm:border-l border-[#4d5b50]">
+              <span className="block text-[11px] font-bold tracking-[.08em] text-[#acb8aa]">
+                ¿Dónde?
+              </span>
+              <span className="mt-1 flex items-center gap-2">
+                <MapPin size={17} className="text-[#b9d88b] shrink-0" />
+                <select name="comuna" className="w-full bg-transparent text-sm outline-none">
+                  <option value="">Todo Santiago</option>
+                  {communes.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            </label>
+            <button type="submit" className="action-primary !rounded-xl !px-6 min-h-12 text-sm">
+              Buscar maquinaria <ArrowRight size={18} />
+            </button>
+          </form>
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-semibold">
+            <a
+              href="/crear-vitrina"
+              className="inline-flex items-center gap-2 text-[#e9eee3] hover:text-[#cfe7b8]"
+            >
+              ¿Tienes maquinaria? Publícala <ArrowUpRight size={16} />
+            </a>
+            <a
+              href="/como-funciona"
+              className="inline-flex items-center gap-2 text-[#aebcad] hover:text-white"
+            >
+              Cómo funciona <ArrowDown size={16} />
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

@@ -1,0 +1,1 @@
+ALTER TABLE `equipment` ADD `presentation_variant` text DEFAULT 'editorial' NOT NULL;
