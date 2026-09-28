@@ -298,11 +298,18 @@ summary:focus-visible {
   font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
+  transition:
+    color var(--maquinal-motion-base) var(--maquinal-ease),
+    transform var(--maquinal-motion-base) var(--maquinal-ease);
 }
 .header-link:hover,
+.header-link:focus-visible,
 .header-link[aria-current="page"],
 .header-link[data-active="true"] {
   color: var(--maquinal-text);
+}
+.header-link:hover {
+  transform: translateY(-1px);
 }
 .header-link:after {
   content: "";
@@ -318,8 +325,15 @@ summary:focus-visible {
   transition: transform var(--maquinal-motion-base) var(--maquinal-ease);
 }
 .header-link[aria-current="page"]:after,
-.header-link[data-active="true"]:after {
+.header-link[data-active="true"]:after,
+.header-link:hover:after,
+.header-link:focus-visible:after {
   transform: scaleX(1);
+}
+.whatsapp-mark {
+  background-color: currentColor;
+  -webkit-mask: url("/whatsapp-mark.svg") center / contain no-repeat;
+  mask: url("/whatsapp-mark.svg") center / contain no-repeat;
 }
 .header-mobile-link {
   display: flex;

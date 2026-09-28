@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, LockKeyhole, MessageCircle } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, LockKeyhole } from "lucide-react";
+import { WhatsAppMark } from "@/components/whatsapp-mark";
 import { SiteFooter } from "@/components/site-footer";
 import { ProviderShowcase } from "@/components/provider-showcase";
 import { findProviderBySlug, listProviderEquipment } from "@/lib/marketplace";
@@ -31,7 +32,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
                 href={"/contactar/proveedor/" + encodeURIComponent(slug)}
                 className="action-primary shrink-0 text-sm"
               >
-                {user ? <MessageCircle size={18} /> : <LockKeyhole size={18} />}{" "}
+                {user ? <WhatsAppMark className="size-[18px]" /> : <LockKeyhole size={18} />}{" "}
                 {user ? "Consultar al proveedor" : "Ingresar para consultar"}{" "}
                 <ArrowUpRight size={17} />
               </Link>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, LockKeyhole, MessageCircle } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, LockKeyhole } from "lucide-react";
+import { WhatsAppMark } from "@/components/whatsapp-mark";
 import { SiteFooter } from "@/components/site-footer";
 import { ListingDetail } from "@/components/listing-detail";
 import { ListingCard } from "@/components/listing-card";
@@ -75,7 +76,7 @@ export default async function MachineryDetail({ params }: { params: Promise<{ sl
                     <DemoInquiryDisclosure subject={listing.title} draftKey={listing.id} />
                   ) : (
                     <Link href={contactHref} className="action-primary mt-5 w-full text-sm">
-                      <MessageCircle size={18} /> Consultar por esta máquina{" "}
+                      <WhatsAppMark className="size-[18px]" /> Consultar por esta máquina{" "}
                       <ArrowUpRight size={17} />
                     </Link>
                   )

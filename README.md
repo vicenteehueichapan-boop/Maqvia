@@ -12,6 +12,7 @@ Marketplace de arriendo de maquinaria para Santiago de Chile. El código se abre
 - `/maquinaria/:slug` muestra tanto fichas reales como ejemplos claramente identificados.
 - `/crear-vitrina` permite probar la presentación antes de iniciar sesión; `/publicar` guía el registro, conserva un borrador local y permite indicar modalidad y monto por servicio opcional.
 - Las consultas reales requieren sesión y llevan a un mensaje revisable para WhatsApp. Maquinal no administra el arriendo ni el pago.
+- El distintivo de WhatsApp se guarda en `public/whatsapp-mark.svg` a partir del [SVG de Simple Icons](https://github.com/simple-icons/simple-icons/blob/develop/icons/whatsapp.svg); se usa únicamente en acciones y explicaciones de contacto.
 
 Los ejemplos ficticios viven en `lib/demo-fixtures.ts`; sus imágenes están en `public/demo/`. No representan inventario disponible. La ruta `/__demo` es un laboratorio solo en desarrollo. Los favoritos y las búsquedas guardadas se almacenan en el navegador y todavía no se sincronizan. Las alertas de nuevas coincidencias y la ubicación exacta de proveedores reales requieren desarrollo adicional antes de ofrecerse.
 

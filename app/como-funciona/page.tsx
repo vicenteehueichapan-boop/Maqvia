@@ -6,11 +6,11 @@ import {
   ArrowUpRight,
   Check,
   LockKeyhole,
-  MessageCircle,
   Search,
   ShieldCheck,
 } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
+import { WhatsAppMark } from "@/components/whatsapp-mark";
 
 export const metadata: Metadata = {
   title: "Cómo funciona | Maquinal",
@@ -281,8 +281,8 @@ export default function HowItWorksPage() {
               cuenta. Para abrir el contacto e iniciar una publicación debes ingresar.
             </p>
             <p className="flex gap-3 text-sm leading-relaxed text-[#c8d3c5]">
-              <MessageCircle size={20} className="shrink-0 text-[#b9d88b]" /> El contacto va al
-              WhatsApp del proveedor. El arriendo y el pago no se gestionan en Maquinal.
+              <WhatsAppMark className="size-5 text-[#b9d88b]" /> El contacto va al WhatsApp del
+              proveedor. El arriendo y el pago no se gestionan en Maquinal.
             </p>
             <p className="flex gap-3 text-sm leading-relaxed text-[#c8d3c5]">
               <Check size={20} className="shrink-0 text-[#b9d88b]" /> Las vistas de ejemplo te dejan

@@ -13,6 +13,7 @@ import {
   readInquiryDraft,
   writeInquiryDraft,
 } from "@/lib/inquiry-draft-repository";
+import { WhatsAppMark } from "@/components/whatsapp-mark";
 
 const empty: Inquiry = { date: "", comuna: "", operator: "", delivery: "", comment: "" };
 type Field = keyof Inquiry;
@@ -191,7 +192,8 @@ export function InquiryForm({
               onClick={() => clearInquiryDraft(draftKey)}
               className="action-primary mt-6 text-sm"
             >
-              Continuar por WhatsApp <ArrowUpRight size={17} />
+              <WhatsAppMark className="size-[18px]" /> Continuar por WhatsApp{" "}
+              <ArrowUpRight size={17} />
             </a>
           ) : (
             <p role="alert" className="mt-5 text-sm text-[#f1b4a4]">
