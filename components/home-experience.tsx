@@ -32,7 +32,7 @@ export function HomeExperience() {
         <div>
           <p className="eyebrow">Explora antes de empezar</p>
           <h2 className="display mt-5 text-[clamp(2.8rem,5.3vw,5rem)]">
-            Mira cómo funciona Maquinal.
+            Mira cómo funciona Maqvia.
           </h2>
         </div>
         <p className="muted-copy max-w-sm lg:ml-auto">

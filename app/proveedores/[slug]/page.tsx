@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowUpRight, LockKeyhole } from "lucide-react";
 import { WhatsAppMark } from "@/components/whatsapp-mark";
 import { SiteFooter } from "@/components/site-footer";
 import { ProviderShowcase } from "@/components/provider-showcase";
-import { findProviderBySlug, listProviderEquipment } from "@/lib/marketplace";
+import { findProviderBySlug, listPublicProviderEquipment } from "@/lib/marketplace";
 import { realListing, realProviderView } from "@/lib/listing-view";
 import { getChatGPTUser } from "@/app/chatgpt-auth";
 export const dynamic = "force-dynamic";
@@ -12,7 +12,8 @@ export default async function ProviderPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   const provider = await findProviderBySlug(slug);
   if (!provider) notFound();
-  const items = await listProviderEquipment(provider.id);
+  const items = await listPublicProviderEquipment(provider.id);
+  if (!items.length) notFound();
   const user = await getChatGPTUser();
   return (
     <main className="min-h-screen">

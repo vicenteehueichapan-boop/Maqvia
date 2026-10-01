@@ -7,9 +7,10 @@ type ListingCardProps = {
   listing: ListingView;
   inert?: boolean;
   actions?: ReactNode;
+  badge?: ReactNode;
 };
 
-export function ListingCard({ listing, inert = false, actions }: ListingCardProps) {
+export function ListingCard({ listing, inert = false, actions, badge }: ListingCardProps) {
   const image = (
     <div className="relative aspect-[1.47] overflow-hidden bg-[#29352f]">
       {listing.images[0] ? (
@@ -30,6 +31,7 @@ export function ListingCard({ listing, inert = false, actions }: ListingCardProp
           EJEMPLO
         </span>
       )}
+      {badge && <div className="absolute right-4 top-4">{badge}</div>}
     </div>
   );
 
@@ -82,9 +84,13 @@ export function ListingCard({ listing, inert = false, actions }: ListingCardProp
             ))}
           </div>
         )}
-        <p className="mt-auto border-t border-[#ffffff19] pt-4 text-base font-bold text-[#f0eee6]">
-          {listing.priceLabel ?? "Consultar precio"}
-        </p>
+
+        <div className="mt-auto border-t border-[#ffffff19] pt-4">
+          <p className="text-base font-bold text-[#f0eee6]">
+            {listing.priceLabel ?? "Consultar precio"}
+          </p>
+        </div>
+
         {actions && <div className="mt-4 border-t border-[#ffffff17] pt-4">{actions}</div>}
       </div>
     </article>

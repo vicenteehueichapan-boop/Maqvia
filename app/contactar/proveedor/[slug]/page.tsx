@@ -14,6 +14,7 @@ export default async function ContactProvider({ params }: { params: Promise<{ sl
       name={provider.name}
       subject={"los equipos y servicios disponibles"}
       phone={provider.whatsapp}
+      email={provider.contactEmail}
     />
   );
 }

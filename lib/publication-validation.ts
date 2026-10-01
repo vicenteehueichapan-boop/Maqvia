@@ -15,6 +15,8 @@ export const publicationSchema = z
         (value) => normalizeChileanWhatsApp(value) !== null,
         "Ingresa un WhatsApp chileno válido, por ejemplo +56 9 1234 5678.",
       ),
+    contactEmail: z.string().trim().max(254, "Usa un correo de hasta 254 caracteres.").default(""),
+    emailContactEnabled: z.enum(["yes", "no"]).default("no"),
     comuna: z.string().min(1, "Selecciona una comuna."),
     description: z
       .string()
@@ -44,6 +46,15 @@ export const publicationSchema = z
     presentationVariant: z.enum(["editorial", "visual", "technical"]).default("editorial"),
   })
   .superRefine((value, context) => {
+    if (
+      value.emailContactEnabled === "yes" &&
+      !z.string().email().safeParse(value.contactEmail).success
+    )
+      context.addIssue({
+        code: "custom",
+        path: ["contactEmail"],
+        message: "Ingresa un correo válido para recibir consultas.",
+      });
     if (
       value.priceKind !== "consult" &&
       (!/^\d+$/.test(value.priceAmount) || Number(value.priceAmount) <= 0)

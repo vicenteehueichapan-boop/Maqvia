@@ -5,45 +5,26 @@ import { WhatsAppMark } from "@/components/whatsapp-mark";
 import { SiteFooter } from "@/components/site-footer";
 import { ListingDetail } from "@/components/listing-detail";
 import { ListingCard } from "@/components/listing-card";
-import { DemoInquiryDisclosure } from "@/components/demo-inquiry-disclosure";
 import { FavoriteAction } from "@/components/favorite-action";
-import {
-  demoEquipment,
-  equipmentForDemoProvider,
-  providerForDemoEquipment,
-} from "@/lib/demo-fixtures";
-import { demoListing, realListing } from "@/lib/listing-view";
-import { findEquipmentById, listProviderEquipment } from "@/lib/marketplace";
+import { realListing } from "@/lib/listing-view";
+import { findEquipmentById, listPublicProviderEquipment } from "@/lib/marketplace";
 import { chatGPTSignInPath, getChatGPTUser } from "@/app/chatgpt-auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function MachineryDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const demo = demoEquipment.find((item) => item.id === slug);
-  const row = demo ? null : await findEquipmentById(slug);
-  if (!demo && !row) notFound();
+  const row = await findEquipmentById(slug);
+  if (!row) notFound();
 
   const user = await getChatGPTUser();
-  const provider = demo ? providerForDemoEquipment(demo) : null;
-  const listing =
-    demo && provider ? demoListing(demo, provider) : realListing(row!.item, row!.provider);
-  const related =
-    demo && provider
-      ? equipmentForDemoProvider(provider.slug)
-          .filter((item) => item.id !== slug)
-          .slice(0, 3)
-          .map((item) => demoListing(item, provider))
-      : row
-        ? (await listProviderEquipment(row.provider.id))
-            .filter((item) => item.id !== slug)
-            .slice(0, 3)
-            .map((item) => realListing(item, row.provider))
-        : [];
+  const listing = realListing(row.item, row.provider);
+  const related = (await listPublicProviderEquipment(row.provider.id))
+    .filter((item) => item.id !== slug)
+    .slice(0, 3)
+    .map((item) => realListing(item, row.provider));
   const contactHref = `/contactar/equipo/${encodeURIComponent(slug)}`;
-  const signInHref = chatGPTSignInPath(
-    demo ? `/maquinaria/${encodeURIComponent(slug)}` : contactHref,
-  );
+  const signInHref = chatGPTSignInPath(contactHref);
   const favoriteSignInHref = chatGPTSignInPath(`/maquinaria/${encodeURIComponent(slug)}`);
 
   return (
@@ -66,32 +47,23 @@ export default async function MachineryDetail({ params }: { params: Promise<{ sl
             listing={listing}
             contact={
               <>
-                {demo && (
-                  <p className="mt-3 text-xs text-[#b6c6ad]">
-                    Publicación de ejemplo. No representa un equipo disponible.
-                  </p>
-                )}
                 {user ? (
-                  demo ? (
-                    <DemoInquiryDisclosure subject={listing.title} draftKey={listing.id} />
-                  ) : (
-                    <Link href={contactHref} className="action-primary mt-5 w-full text-sm">
-                      <WhatsAppMark className="size-[18px]" /> Consultar por esta máquina{" "}
-                      <ArrowUpRight size={17} />
-                    </Link>
-                  )
+                  <Link href={contactHref} className="action-primary mt-5 w-full text-sm">
+                    <WhatsAppMark className="size-[18px]" /> Consultar por esta máquina{" "}
+                    <ArrowUpRight size={17} />
+                  </Link>
                 ) : (
                   <a href={signInHref} target="_top" className="action-primary mt-5 w-full text-sm">
                     <LockKeyhole size={18} /> Ingresa para consultar <ArrowUpRight size={17} />
                   </a>
                 )}
-                {!demo && (
+                <div className="mt-3 flex justify-center">
                   <FavoriteAction
-                    id={slug}
-                    userId={user?.userId || null}
-                    signInUrl={favoriteSignInHref}
+                    equipmentId={listing.id}
+                    authenticated={Boolean(user)}
+                    signInHref={favoriteSignInHref}
                   />
-                )}
+                </div>
                 <p className="mt-3 text-center text-xs text-[#9eac9b]">
                   Las condiciones de arriendo se acuerdan directamente con el proveedor.
                 </p>

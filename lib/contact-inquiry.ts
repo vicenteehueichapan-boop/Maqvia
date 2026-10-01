@@ -32,8 +32,8 @@ export function buildInquiryMessage(
 ): string {
   const greeting =
     kind === "provider"
-      ? "Hola, encontré tu vitrina en Maquinal."
-      : `Hola, vi tu publicación “${subject.trim()}” en Maquinal.`;
+      ? "Hola, encontré tu vitrina en Maqvia."
+      : `Hola, vi tu publicación “${subject.trim()}” en Maqvia.`;
   const lines = [greeting, "", "Quisiera consultar:"];
   if (values.comuna.trim()) lines.push(`• Comuna: ${values.comuna.trim()}`);
   if (values.date) {

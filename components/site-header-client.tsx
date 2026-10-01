@@ -3,15 +3,33 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Menu, UserRound, X } from "lucide-react";
+import {
+  ArrowUpRight,
+  LayoutList,
+  LogOut,
+  Menu,
+  Plus,
+  UserRound,
+  Warehouse,
+  X,
+} from "lucide-react";
 import { Brand } from "@/components/brand";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 type HeaderProps = { authenticated: boolean; signInHref: string };
+
 const navigation = [
   { label: "Inicio", href: "/", match: "/" },
   { label: "Explorar maquinaria", href: "/maquinaria", match: "/maquinaria" },
   { label: "Cómo funciona", href: "/como-funciona", match: "/como-funciona" },
+  { label: "Quiénes somos", href: "/quienes-somos", match: "/quienes-somos" },
   { label: "Crear mi vitrina", href: "/crear-vitrina", match: "/crear-vitrina" },
 ] as const;
 
@@ -22,132 +40,188 @@ export function SiteHeaderClient({ authenticated, signInHref }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const update = () => {
-      setScrolled(window.scrollY > 18);
-    };
+    const update = () => setScrolled(window.scrollY > 24);
     update();
     window.addEventListener("scroll", update, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", update);
-    };
+    return () => window.removeEventListener("scroll", update);
   }, [pathname]);
 
-  const isActive = (match: string) =>
-    pathname === match ||
-    pathname.startsWith(`${match}/`) ||
-    (match === "/maquinaria" &&
-      (pathname.startsWith("/equipos/") ||
-        pathname.startsWith("/proveedores/") ||
-        pathname.startsWith("/demo/equipos/") ||
-        pathname.startsWith("/demo/proveedores/"))) ||
-    (match === "/crear-vitrina" && pathname === "/publicar");
-  const accountHref = authenticated ? "/cuenta" : signInHref;
+  const isActive = (match: string) => {
+    if (match === "/") return pathname === "/";
+    return (
+      pathname === match ||
+      pathname.startsWith(`${match}/`) ||
+      (match === "/maquinaria" &&
+        (pathname.startsWith("/equipos/") ||
+          pathname.startsWith("/proveedores/") ||
+          pathname.startsWith("/demo/"))) ||
+      (match === "/crear-vitrina" && pathname === "/publicar")
+    );
+  };
 
   return (
     <header className="site-header" data-home={home} data-scrolled={scrolled}>
-      <div className="container-shell flex h-[74px] items-center justify-between gap-4">
+      <div className="site-header-inner">
+        {/* ── Logo ── */}
         <Brand compact />
-        <nav
-          aria-label="Navegación principal"
-          className="hidden lg:flex items-center gap-5 xl:gap-8"
-        >
+
+        {/* ── Desktop navigation ── */}
+        <nav aria-label="Navegación principal" className="site-nav">
           {navigation.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="header-link"
+              className="site-nav-link"
               aria-current={isActive(item.match) ? "page" : undefined}
             >
               {item.label}
             </Link>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-2 lg:ml-0">
+
+        {/* ── Desktop actions ── */}
+        <div className="site-actions">
           {authenticated ? (
-            <Link
-              href={accountHref}
-              aria-current={pathname === "/cuenta" ? "page" : undefined}
-              className="action-ghost header-auth-action text-sm"
-            >
-              <UserRound size={17} /> Mi cuenta
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="site-user-btn" aria-label="Menú de cuenta">
+                  <UserRound size={15} strokeWidth={1.75} />
+                  <span>Mi cuenta</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" sideOffset={10} className="w-52">
+                <DropdownMenuItem asChild>
+                  <Link href="/cuenta" className="flex items-center gap-2.5">
+                    <UserRound size={14} /> Perfil
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/cuenta" className="flex items-center gap-2.5">
+                    <Warehouse size={14} /> Mi vitrina
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/cuenta" className="flex items-center gap-2.5">
+                    <LayoutList size={14} /> Mis publicaciones
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <a
+                    href="/salir?return_to=%2F"
+                    className="flex items-center gap-2.5 text-[#e38b78]!"
+                  >
+                    <LogOut size={14} /> Cerrar sesión
+                  </a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
-            <a href={accountHref} target="_top" className="action-ghost header-auth-action text-sm">
-              <UserRound size={17} /> Ingresar
-            </a>
+            <Link href={signInHref} className="site-sign-in">
+              <UserRound size={15} strokeWidth={1.75} />
+              <span>Ingresar</span>
+            </Link>
           )}
+
           <Link
             href="/publicar"
             aria-current={pathname === "/publicar" ? "page" : undefined}
-            className="action-primary min-h-10! px-4! py-2! text-sm"
+            className="action-primary site-publish-btn"
           >
-            Publicar <ArrowUpRight size={16} />
+            <Plus size={15} strokeWidth={2.5} />
+            <span>Publicar</span>
           </Link>
+        </div>
+
+        {/* ── Mobile: mini CTA + hamburger ── */}
+        <div className="site-mobile">
+          <Link
+            href="/publicar"
+            className="action-primary site-publish-mobile"
+            aria-label="Publicar maquinaria"
+          >
+            <Plus size={18} strokeWidth={2.5} />
+            <span>Publicar</span>
+          </Link>
+
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="grid size-11 place-items-center rounded-xl border border-[#ffffff32] text-[#eef0e8] lg:hidden"
+                className="site-burger"
                 aria-label="Abrir menú"
                 aria-expanded={menuOpen}
               >
                 <Menu size={20} />
               </button>
             </SheetTrigger>
-            <SheetContent
-              side="right"
-              showCloseButton={false}
-              className="w-[min(92vw,380px)]! max-w-none! border-l border-[#465249] bg-[#19211e] p-6 shadow-[-24px_0_80px_#0009]"
-            >
-              <div className="flex items-center justify-between border-b border-[#ffffff16] pb-6">
-                <SheetTitle className="text-lg tracking-[-.04em]">Menú</SheetTitle>
+
+            <SheetContent side="right" showCloseButton={false} className="mobile-sheet">
+              {/* Sheet top: brand + close */}
+              <div className="mobile-sheet-top">
+                <SheetTitle className="sr-only">Navegación</SheetTitle>
+                <Brand compact />
                 <SheetClose asChild>
-                  <button
-                    type="button"
-                    aria-label="Cerrar menú"
-                    className="grid size-11 place-items-center rounded-xl border border-[#ffffff32]"
-                  >
-                    <X size={20} />
+                  <button type="button" aria-label="Cerrar menú" className="mobile-close-btn">
+                    <X size={19} />
                   </button>
                 </SheetClose>
               </div>
-              <nav aria-label="Navegación móvil" className="mt-3 flex flex-col">
+
+              {/* Sheet nav links */}
+              <nav aria-label="Navegación móvil" className="mobile-nav">
                 {navigation.map((item) => (
                   <SheetClose asChild key={item.href}>
                     <Link
                       href={item.href}
-                      className="header-mobile-link"
+                      className="mobile-nav-link"
                       aria-current={isActive(item.match) ? "page" : undefined}
                     >
-                      {item.label}
-                      <ArrowUpRight size={17} />
+                      <span>{item.label}</span>
+                      <ArrowUpRight size={15} />
                     </Link>
                   </SheetClose>
                 ))}
                 <SheetClose asChild>
                   <Link
                     href="/publicar"
-                    className="header-mobile-link"
+                    className="mobile-nav-link"
                     aria-current={pathname === "/publicar" ? "page" : undefined}
                   >
-                    Publicar maquinaria
-                    <ArrowUpRight size={17} />
+                    <span>Publicar maquinaria</span>
+                    <ArrowUpRight size={15} />
                   </Link>
                 </SheetClose>
               </nav>
-              <div className="mt-auto border-t border-[#ffffff16] pt-6">
+
+              {/* Sheet footer: session */}
+              <div className="mobile-sheet-foot">
                 {authenticated ? (
-                  <SheetClose asChild>
-                    <Link href="/cuenta" className="action-secondary w-full text-sm">
-                      <UserRound size={17} /> Mi cuenta
-                    </Link>
-                  </SheetClose>
+                  <>
+                    <SheetClose asChild>
+                      <Link
+                        href="/cuenta"
+                        className="action-secondary w-full justify-center text-sm"
+                      >
+                        <UserRound size={16} /> Mi cuenta
+                      </Link>
+                    </SheetClose>
+                    <a
+                      href="/salir?return_to=%2F"
+                      className="action-ghost w-full justify-center text-sm mt-2"
+                    >
+                      <LogOut size={15} /> Cerrar sesión
+                    </a>
+                  </>
                 ) : (
-                  <a href={accountHref} target="_top" className="action-secondary w-full text-sm">
-                    <UserRound size={17} /> Ingresar o registrarme
-                  </a>
+                  <Link
+                    href={signInHref}
+                    className="action-secondary w-full justify-center text-sm"
+                  >
+                    <UserRound size={16} /> Ingresar o registrarme
+                  </Link>
                 )}
-                <p className="mt-5 text-xs leading-relaxed text-[#aeb9ad]">
+                <p className="mobile-sheet-note">
                   Encuentra maquinaria o crea tu vitrina con una sola cuenta.
                 </p>
               </div>

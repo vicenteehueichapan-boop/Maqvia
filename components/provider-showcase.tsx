@@ -9,11 +9,13 @@ export function ProviderShowcase({
   listings,
   contact,
   preview = false,
+  onPreviewListingOpen,
 }: {
   provider: ProviderView;
   listings: ListingView[];
   contact?: ReactNode;
   preview?: boolean;
+  onPreviewListingOpen?: () => void;
 }) {
   return (
     <>
@@ -65,7 +67,7 @@ export function ProviderShowcase({
           )}
           {provider.esEjemplo && (
             <p className="mt-8 text-xs leading-relaxed text-[#9faa9d]">
-              Perfil ficticio para probar Maquinal. Las fotografías son ilustrativas; ningún equipo
+              Perfil ficticio para probar Maqvia. Las fotografías son ilustrativas; ningún equipo
               representa inventario disponible.
             </p>
           )}
@@ -83,7 +85,22 @@ export function ProviderShowcase({
           {listings.length ? (
             <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
               {listings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} inert={preview} />
+                <ListingCard
+                  key={listing.id}
+                  listing={listing}
+                  inert={preview}
+                  actions={
+                    preview && onPreviewListingOpen ? (
+                      <button
+                        type="button"
+                        onClick={onPreviewListingOpen}
+                        className="action-text text-sm"
+                      >
+                        Abrir ficha <ArrowUpRight size={16} />
+                      </button>
+                    ) : undefined
+                  }
+                />
               ))}
             </div>
           ) : (

@@ -1,14 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, MapPin, Search } from "lucide-react";
+import { ArrowRight, MapPin, Search } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { CatalogGrid } from "@/components/catalog-grid";
-import { CatalogSavedActions } from "@/components/catalog-saved-actions";
+import { CatalogResultsFocus } from "@/components/catalog-results-focus";
 import { RouterGetForm } from "@/components/router-get-form";
-import { ListingCard } from "@/components/listing-card";
 import { getChatGPTUser, chatGPTSignInPath } from "@/app/chatgpt-auth";
 import { searchEquipment } from "@/lib/marketplace";
-import { demoEquipment, providerForDemoEquipment } from "@/lib/demo-fixtures";
-import { demoListing, realListing } from "@/lib/listing-view";
+import { realListing } from "@/lib/listing-view";
 export const dynamic = "force-dynamic";
 const communes = [
   "Santiago",
@@ -52,19 +50,6 @@ export default async function Buscar({
       "&category=" +
       encodeURIComponent(category),
   );
-  const normalized = q.toLocaleLowerCase("es-CL");
-  const examples = demoEquipment.filter(
-    (item) =>
-      (!comuna || item.comuna === comuna) &&
-      (!category || item.category === category) &&
-      (!normalized ||
-        [
-          item.title,
-          item.category,
-          item.description || "",
-          providerForDemoEquipment(item).name,
-        ].some((value) => value.toLocaleLowerCase("es-CL").includes(normalized))),
-  );
   return (
     <main className="min-h-screen">
       <section className="relative isolate overflow-hidden border-b border-[#405347] bg-[#171e1b]">
@@ -79,13 +64,14 @@ export default async function Buscar({
           <h1 className="display mt-4 max-w-3xl text-[clamp(3rem,5vw,5rem)]">
             Encuentra lo que mueve tu obra.
           </h1>
-          <p className="mt-5 max-w-xl text-[#d4dfd1]">
-            Busca equipos y servicios por nombre o comuna. Abre cada ficha para conocer al
-            proveedor.
+          <p className="mt-5 max-w-2xl text-sm text-[#d4dfd1] md:text-base">
+            Busca por equipo, comuna o categoría. Abre una ficha para revisar los detalles antes de
+            contactar al proveedor.
           </p>
           <RouterGetForm
             key={`search:${q}:${comuna}:${category}`}
             action="/maquinaria"
+            hash="#resultados"
             className="mt-9 grid gap-2 rounded-2xl border border-[#8ea1847a] bg-[#1b2520]/95 p-2 shadow-[0_18px_70px_#0008] backdrop-blur-xl md:grid-cols-[1fr_230px_auto]"
           >
             <label className="flex items-center gap-2 px-4">
@@ -122,6 +108,7 @@ export default async function Buscar({
           <RouterGetForm
             key={`category:${q}:${comuna}:${category}`}
             action="/maquinaria"
+            hash="#resultados"
             className="mt-4 flex flex-wrap items-center gap-3"
           >
             <input type="hidden" name="q" value={q} />
@@ -159,18 +146,16 @@ export default async function Buscar({
           </div>
         </div>
       </section>
-      <CatalogSavedActions
-        userId={user?.userId || null}
-        q={q}
-        comuna={comuna}
-        category={category}
-        signInUrl={signInUrl}
-      />
-      <section className="container-shell py-13 md:py-17">
+      <section id="resultados" className="container-shell scroll-mt-20 py-13 md:py-17">
+        <CatalogResultsFocus searchKey={`${q}:${comuna}:${category}`} />
         <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="eyebrow">Publicaciones activas</p>
-            <h2 className="mt-2 text-2xl font-bold tracking-[-.04em]">
+            <h2
+              id="resultados-titulo"
+              tabIndex={-1}
+              className="mt-2 scroll-mt-24 text-2xl font-bold tracking-[-.04em] outline-none"
+            >
               {error
                 ? "No pudimos cargar el catálogo"
                 : rows.length + " resultado" + (rows.length === 1 ? "" : "s")}
@@ -184,7 +169,7 @@ export default async function Buscar({
         </div>
         {error ? (
           <p role="alert" className="premium-panel rounded-2xl p-7">
-            No pudimos cargar las publicaciones reales. Prueba de nuevo más tarde.
+            No pudimos cargar las publicaciones. Prueba de nuevo más tarde.
           </p>
         ) : rows.length ? (
           <CatalogGrid
@@ -194,47 +179,12 @@ export default async function Buscar({
           />
         ) : (
           <div className="premium-panel rounded-2xl p-7">
-            <p className="font-bold">No encontramos equipos reales con esos filtros.</p>
+            <p className="font-bold">No encontramos equipos con esos filtros.</p>
             <p className="muted-copy mt-2 text-sm">
-              Prueba con otra comuna o categoría. Los ejemplos de abajo muestran cómo se verán las
-              publicaciones.
+              Prueba con otra comuna o categoría, o vuelve más tarde para ver nuevas publicaciones.
             </p>
           </div>
         )}
-        <div className="mt-16 border-t border-[#48564a] pt-10">
-          <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="eyebrow">Recorrido de producto · ejemplos ficticios</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-[-.05em]">
-                Así se verá el catálogo.
-              </h2>
-              <p className="muted-copy mt-3 max-w-2xl text-sm">
-                Estas fichas no corresponden a equipos disponibles. Las fotografías son ilustrativas
-                y el contacto se prueba sin enviar mensajes.
-              </p>
-            </div>
-            <Link
-              href="/como-funciona"
-              className="inline-flex items-center gap-2 text-sm font-bold text-[#d4e6c0]"
-            >
-              Cómo funciona Maquinal <ArrowUpRight size={17} />
-            </Link>
-          </div>
-          {examples.length ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {examples.map((item) => (
-                <ListingCard
-                  key={item.id}
-                  listing={demoListing(item, providerForDemoEquipment(item))}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-[#adbbaa]">
-              No hay ejemplos para esos filtros. Limpia la búsqueda para explorar todas las fichas.
-            </p>
-          )}
-        </div>
       </section>
       <SiteFooter />
     </main>

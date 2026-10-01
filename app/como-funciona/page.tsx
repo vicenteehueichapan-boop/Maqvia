@@ -13,7 +13,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { WhatsAppMark } from "@/components/whatsapp-mark";
 
 export const metadata: Metadata = {
-  title: "Cómo funciona | Maquinal",
+  title: "Cómo funciona | Maqvia",
   description:
     "Aprende a buscar maquinaria en Santiago, comparar fichas y crear tu propia vitrina con fotos y contacto directo.",
 };
@@ -41,10 +41,10 @@ const searchSteps: GuideStep[] = [
     title: "Parte por el equipo y la comuna.",
     body: "Escribe lo que necesitas y elige una zona de Santiago. Puedes comenzar con una búsqueda amplia y ajustar los filtros después.",
     detail:
-      "El catálogo distingue las publicaciones reales de los ejemplos que sirven para conocer la experiencia.",
+      "El catálogo muestra los equipos publicados y permite ajustar la búsqueda por nombre, comuna y categoría.",
     image: "/guia/buscar.jpg",
-    alt: "Captura del buscador de maquinaria de Maquinal",
-    label: "Catálogo de Maquinal",
+    alt: "Captura del buscador de maquinaria de Maqvia",
+    label: "Catálogo de Maqvia",
     href: "/maquinaria",
     action: "Abrir catálogo",
   },
@@ -54,12 +54,12 @@ const searchSteps: GuideStep[] = [
     title: "Abre fichas y compara opciones.",
     body: "Cada ficha reúne fotos, ubicación, características y el nombre de quien ofrece el equipo. Revisa si incluye operador o traslado antes de consultar.",
     detail:
-      "Selecciona hasta tres fichas para contrastar precio, comuna y servicios. Los ejemplos solo enseñan el funcionamiento.",
+      "Selecciona hasta tres fichas para contrastar precio, comuna y servicios antes de decidir a quién consultar.",
     image: "/guia/comparar.jpg",
-    alt: "Captura de la comparación de equipos de ejemplo en Maquinal",
-    label: "Comparación demostrativa",
-    href: "/maquinaria/miniexcavadora-3t",
-    action: "Ver ficha de ejemplo",
+    alt: "Captura de la comparación de equipos de ejemplo en Maqvia",
+    label: "Comparación de publicaciones",
+    href: "/maquinaria",
+    action: "Abrir catálogo",
   },
   {
     number: "03",
@@ -67,10 +67,10 @@ const searchSteps: GuideStep[] = [
     title: "Habla directamente con el proveedor.",
     body: "Al encontrar una opción, inicia sesión para abrir el contacto. La conversación continúa por WhatsApp con la persona que publicó el equipo.",
     detail:
-      "Disponibilidad, condiciones, arriendo y pago se acuerdan entre ustedes. Maquinal facilita el encuentro.",
+      "Disponibilidad, condiciones, arriendo y pago se acuerdan entre ustedes. Maqvia facilita el encuentro.",
     image: "/guia/ficha.jpg",
-    alt: "Captura de una ficha de equipo de ejemplo en Maquinal",
-    label: "Ficha demostrativa",
+    alt: "Captura de una ficha de equipo de ejemplo en Maqvia",
+    label: "Ficha de maquinaria",
     href: "/maquinaria",
     action: "Explorar opciones",
   },
@@ -85,7 +85,7 @@ const publishSteps: GuideStep[] = [
     detail:
       "La vista previa es local y sirve para explorar cómo podría verse tu publicación; no la publica automáticamente.",
     image: "/guia/vista-previa.jpg",
-    alt: "Captura del asistente de vista previa de Maquinal",
+    alt: "Captura del asistente de vista previa de Maqvia",
     label: "Vista previa interactiva",
     href: "/crear-vitrina#vista-previa",
     action: "Probar mi vista previa",
@@ -112,10 +112,10 @@ const publishSteps: GuideStep[] = [
     detail:
       "Tú recibes y atiendes las consultas directamente; puedes añadir más publicaciones desde tu cuenta.",
     image: "/guia/proveedor.jpg",
-    alt: "Captura de una vitrina demostrativa de proveedor en Maquinal",
-    label: "Perfil demostrativo",
-    href: "/demo/proveedores/andes-maquinarias-demo",
-    action: "Ver vitrina de ejemplo",
+    alt: "Captura de una vitrina demostrativa de proveedor en Maqvia",
+    label: "Vitrina de proveedor",
+    href: "/publicar",
+    action: "Crear mi vitrina",
   },
 ];
 
@@ -170,7 +170,7 @@ function GuideSection({
                     <i />
                   </span>
                   <span className="text-[11px] font-semibold text-[#aebbaa]">
-                    {step.label} · pantalla de Maquinal
+                    {step.label} · pantalla de Maqvia
                   </span>
                 </div>
                 <img
@@ -180,7 +180,8 @@ function GuideSection({
                   loading="lazy"
                 />
                 <figcaption className="border-t border-[#ffffff13] bg-[#1a211e] px-4 py-3 text-xs text-[#a8b5a5]">
-                  Las publicaciones identificadas como ejemplo son demostrativas.
+                  Captura ilustrativa del recorrido; los equipos disponibles se consultan en el
+                  catálogo.
                 </figcaption>
               </figure>
               {step.secondaryImage ? (
@@ -192,7 +193,7 @@ function GuideSection({
                       <i />
                     </span>
                     <span className="text-[11px] font-semibold text-[#aebbaa]">
-                      Ficha del equipo · pantalla de Maquinal
+                      Ficha del equipo · pantalla de Maqvia
                     </span>
                   </div>
                   <img
@@ -227,7 +228,7 @@ export default function HowItWorksPage() {
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#101313f5_0%,#101313d8_52%,#1013135e_100%)]" />
         <div className="container-shell grid min-h-[590px] items-center gap-10 py-19 md:grid-cols-[1fr_.48fr] md:py-24">
           <div className="max-w-[780px]">
-            <p className="eyebrow">Maquinal · guía de uso</p>
+            <p className="eyebrow">Maqvia · guía de uso</p>
             <h1 className="display mt-6 text-[clamp(3.3rem,6.5vw,6.8rem)]">
               De la búsqueda al contacto. <span className="text-[#cce3af]">Sin vueltas.</span>
             </h1>
@@ -282,11 +283,11 @@ export default function HowItWorksPage() {
             </p>
             <p className="flex gap-3 text-sm leading-relaxed text-[#c8d3c5]">
               <WhatsAppMark className="size-5 text-[#b9d88b]" /> El contacto va al WhatsApp del
-              proveedor. El arriendo y el pago no se gestionan en Maquinal.
+              proveedor. El arriendo y el pago no se gestionan en Maqvia.
             </p>
             <p className="flex gap-3 text-sm leading-relaxed text-[#c8d3c5]">
-              <Check size={20} className="shrink-0 text-[#b9d88b]" /> Las vistas de ejemplo te dejan
-              entender el sitio antes de publicar o contactar.
+              <Check size={20} className="shrink-0 text-[#b9d88b]" /> La vista previa te permite
+              revisar cómo aparecerá tu equipo antes de publicarlo.
             </p>
             <p className="flex gap-3 text-sm leading-relaxed text-[#c8d3c5]">
               <ShieldCheck size={20} className="shrink-0 text-[#b9d88b]" /> Una misma cuenta sirve

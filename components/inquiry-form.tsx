@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState, type FormEvent } from "react";
-import { ArrowUpRight, Check, MessageCircle } from "lucide-react";
+import { ArrowUpRight, Check, Mail, MessageCircle } from "lucide-react";
 import {
   buildInquiryMessage,
   buildWhatsAppUrl,
@@ -14,6 +14,7 @@ import {
   writeInquiryDraft,
 } from "@/lib/inquiry-draft-repository";
 import { WhatsAppMark } from "@/components/whatsapp-mark";
+import { GmailMark } from "@/components/gmail-mark";
 
 const empty: Inquiry = { date: "", comuna: "", operator: "", delivery: "", comment: "" };
 type Field = keyof Inquiry;
@@ -21,12 +22,14 @@ type Field = keyof Inquiry;
 export function InquiryForm({
   subject,
   phone,
+  email = "",
   draftKey,
   demo = false,
   kind = "item",
 }: {
   subject: string;
   phone?: string;
+  email?: string;
   draftKey: string;
   demo?: boolean;
   kind?: "item" | "provider";
@@ -45,6 +48,11 @@ export function InquiryForm({
       ) as Partial<Record<Field, string>>);
   const message = parsed.success ? buildInquiryMessage(subject, parsed.data, kind) : "";
   const url = !demo && message ? buildWhatsAppUrl(phone || "", message) : null;
+  const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "";
+  const mailtoUrl =
+    !demo && message && validEmail
+      ? `mailto:${encodeURIComponent(validEmail)}?subject=${encodeURIComponent(`Consulta por ${subject}`)}&body=${encodeURIComponent(message)}`
+      : null;
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -184,24 +192,47 @@ export function InquiryForm({
             <p className="mt-5 text-xs text-[#adbdac]">
               Esta ficha es un ejemplo. No se abrirá ningún contacto real.
             </p>
-          ) : url ? (
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => clearInquiryDraft(draftKey)}
-              className="action-primary mt-6 text-sm"
-            >
-              <WhatsAppMark className="size-[18px]" /> Continuar por WhatsApp{" "}
-              <ArrowUpRight size={17} />
-            </a>
+          ) : url || mailtoUrl ? (
+            <div className="mt-6 flex flex-wrap gap-3">
+              {url && (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => clearInquiryDraft(draftKey)}
+                  className="action-primary text-sm"
+                >
+                  <WhatsAppMark className="size-[18px]" /> Continuar por WhatsApp{" "}
+                  <ArrowUpRight size={17} />
+                </a>
+              )}
+              {mailtoUrl && (
+                <a
+                  href={mailtoUrl}
+                  onClick={() => clearInquiryDraft(draftKey)}
+                  className="action-secondary text-sm"
+                >
+                  {validEmail.toLowerCase().endsWith("@gmail.com") ? (
+                    <GmailMark className="size-[19px]" />
+                  ) : (
+                    <Mail size={19} />
+                  )}
+                  Continuar por correo <ArrowUpRight size={17} />
+                </a>
+              )}
+            </div>
           ) : (
             <p role="alert" className="mt-5 text-sm text-[#f1b4a4]">
               No pudimos abrir el contacto de este proveedor.
             </p>
           )}
+          {mailtoUrl && (
+            <p className="mt-3 break-all text-xs text-[#bdcdb6]">
+              Correo del proveedor: {validEmail}
+            </p>
+          )}
           <p className="mt-4 text-xs text-[#a8b8a7]">
-            Podrás revisar y modificar el mensaje en WhatsApp antes de enviarlo. Maquinal no lo
+            Podrás revisar y modificar el mensaje en tu aplicación antes de enviarlo. Maqvia no lo
             envía por ti.
           </p>
         </div>

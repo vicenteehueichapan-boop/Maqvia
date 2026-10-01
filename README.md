@@ -1,4 +1,4 @@
-# Maquinal
+# Maqvia
 
 Marketplace de arriendo de maquinaria para Santiago de Chile. El código se abre directamente en Visual Studio Code desde esta carpeta.
 
@@ -6,15 +6,21 @@ Marketplace de arriendo de maquinaria para Santiago de Chile. El código se abre
 
 - `npm install` instala las dependencias.
 - `npm run dev` abre el sitio local en `http://localhost:5173`.
-- `npm run format:check`, `npm run lint`, `npx tsc --noEmit`, `node --experimental-strip-types --test tests/*.test.ts` y `npm run build` comprueban la entrega.
+- `npm run format:check`, `npm run lint`, `npx tsc --noEmit`, `npm test` y `npm run build` comprueban la entrega.
 - `/maquinaria` es el catálogo canónico; los filtros viajan en la URL.
-- El encabezado se comparte desde `app/layout.tsx`; Inicio, catálogo y guía navegan sin desmontarlo. La entrada de página dura 180 ms y se desactiva con movimiento reducido.
-- `/maquinaria/:slug` muestra tanto fichas reales como ejemplos claramente identificados.
-- `/crear-vitrina` permite probar la presentación antes de iniciar sesión; `/publicar` guía el registro, conserva un borrador local y permite indicar modalidad y monto por servicio opcional.
-- Las consultas reales requieren sesión y llevan a un mensaje revisable para WhatsApp. Maquinal no administra el arriendo ni el pago.
+- El encabezado se comparte desde `app/layout.tsx`: usa una barra superior compacta con enlaces visibles en escritorio y menú adaptable en pantallas estrechas.
+- `/maquinaria/:slug` abre la ficha publicada. El catálogo principal ya no mezcla inventario con fichas ficticias.
+- `/crear-vitrina` permite probar el recorrido catálogo → ficha → vitrina antes de iniciar sesión; `/publicar` guía el registro, conserva un borrador local y permite indicar modalidad y monto por servicio opcional. Al ingresar, la vista previa anónima se transfiere a la cuenta que la continúa; los borradores de publicación y edición quedan separados por cuenta y equipo en la misma pestaña. El borrador usa `sessionStorage`: no se comparte entre dispositivos ni sustituye una publicación guardada en D1.
+- `/ingresar` concentra el acceso. En localhost, el inicio de sesión de la plataforma usa una identidad de prueba fija (`Seedy`); no crea cuentas distintas. El sitio alojado depende del inicio de sesión de ChatGPT que proporciona la plataforma. `/salir` cierra esa sesión.
+- La autenticación alojada solo confía en las cabeceras de identidad cuando `AUTH_TRUSTED_PROXY=sites` **y** se ha comprobado que el borde de Sites elimina las cabeceras enviadas por visitantes e impide acceder directamente al Worker. Esta variable es una afirmación de despliegue, no una firma. Un Worker público independiente necesita un proveedor de identidad real y sesiones verificadas en el servidor; subirlo tal como está no crea cuentas públicas seguras.
+- Las publicaciones y sus fotografías se guardan en Cloudflare D1 y R2, respectivamente. Desde Mi cuenta se pueden editar, pausar, reactivar y retirar. Retirar oculta la publicación, pero conserva los datos para recuperarla. Los favoritos se guardan en D1 por usuario.
+- El formulario de publicación tiene cinco pasos: negocio, equipo, fotografías, precio y opciones, y vista previa. Los ajustes menos frecuentes se despliegan dentro del paso de precio. Mi cuenta muestra las fichas con fotografías, su estado, fecha y número real de usuarios que las guardaron. Aún no se miden visitas ni contactos.
+- El correo de la cuenta se propone como contacto opcional al publicar. El proveedor ingresa su WhatsApp en el formulario; en publicaciones posteriores se recupera el número de su vitrina. Ambos datos se pueden modificar antes de publicar. Los contactos solo se muestran después de ingresar.
+- Las consultas reales requieren sesión y llevan a un mensaje revisable para WhatsApp o, cuando el proveedor habilitó correo, a la aplicación de correo. Maqvia no administra el arriendo ni el pago.
 - El distintivo de WhatsApp se guarda en `public/whatsapp-mark.svg` a partir del [SVG de Simple Icons](https://github.com/simple-icons/simple-icons/blob/develop/icons/whatsapp.svg); se usa únicamente en acciones y explicaciones de contacto.
+- El distintivo de Gmail se guarda en `public/gmail-mark.svg` desde el [recurso de Google Workspace](https://knowledge.workspace.google.com/static/images/icons/product/gmail.svg); solo identifica direcciones `@gmail.com`. Las demás usan un ícono de correo genérico.
 
-Los ejemplos ficticios viven en `lib/demo-fixtures.ts`; sus imágenes están en `public/demo/`. No representan inventario disponible. La ruta `/__demo` es un laboratorio solo en desarrollo. Los favoritos y las búsquedas guardadas se almacenan en el navegador y todavía no se sincronizan. Las alertas de nuevas coincidencias y la ubicación exacta de proveedores reales requieren desarrollo adicional antes de ofrecerse.
+Las rutas heredadas `/demo` y `/__demo` permanecen para revisión interna, pero no forman parte de la navegación ni del catálogo principal. Las fotos editoriales son ilustrativas. El borrador de publicación se conserva localmente hasta enviarlo. Antes de un lanzamiento público se requieren moderación, políticas de privacidad y operación, y verificar la disponibilidad legal y del dominio del nombre provisional Maqvia. Las alertas de nuevas coincidencias y la ubicación exacta requieren desarrollo adicional.
 
 El mapa de ubicación exacta solo aparece en un ejemplo ficticio y se carga al solicitarlo; los proveedores reales pueden indicar comuna o sector aproximado. Antes de usar mapas de forma comercial a escala, debe elegirse un servicio con capacidad y condiciones adecuadas. Véase la [política de mosaicos de OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/).
 
@@ -69,14 +75,14 @@ Local tool usage metrics are disabled by default. Set `WRANGLER_SEND_METRICS=tru
 - `.openai/hosting.json` declares optional Sites D1 and R2 bindings
 - `vite.config.ts` simulates declared bindings for local development
 - `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
-- `db/schema.ts` starts intentionally empty
+- `db/schema.ts` defines provider, equipment, and favorites tables
 - `@cloudflare/workers-types` provides Worker types; `cloudflare-env.d.ts` declares optional `DB`/`BUCKET` bindings—update these declarations if binding names change
 - `examples/d1/` contains an optional D1 example surface
 - `drizzle.config.ts` supports local migration generation when needed
 
 ## Workspace Auth Headers
 
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
+Only behind a verified Sites authentication edge do signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present. Do not treat raw headers from an independently deployed public Worker as proof of identity; set `AUTH_TRUSTED_PROXY=sites` only after verifying that the edge strips visitor-supplied identity headers and blocks direct Worker access.
 
 The user ID is stable for the same user on the same Site and different across Sites. Use it as the durable user key; use email and name for display or contact purposes.
 

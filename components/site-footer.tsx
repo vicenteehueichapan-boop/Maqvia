@@ -22,16 +22,13 @@ export function SiteFooter() {
             <Link href="/crear-vitrina" className="hover:text-[#b9d88b]">
               Crear mi vitrina
             </Link>
-            <Link href="/demo/proveedores/andes-maquinarias-demo" className="hover:text-[#b9d88b]">
-              Vitrina de ejemplo
-            </Link>
             <Link href="/publicar" className="hover:text-[#b9d88b]">
               Publicar <ArrowUpRight size={14} className="inline" />
             </Link>
           </div>
         </div>
         <div className="mt-10 pt-5 border-t border-[#343f37] flex flex-col sm:flex-row sm:justify-between gap-3 text-xs text-[#879488]">
-          <span>© {new Date().getFullYear()} Maquinal</span>
+          <span>© {new Date().getFullYear()} Maqvia</span>
           <span>El contacto, arriendo y pago se acuerdan directamente entre usuarios.</span>
         </div>
       </div>

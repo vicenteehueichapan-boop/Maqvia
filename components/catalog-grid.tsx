@@ -2,14 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { GitCompareArrows, Heart, X } from "lucide-react";
+import { Bookmark, GitCompareArrows, X } from "lucide-react";
 import { ListingCard } from "@/components/listing-card";
-import {
-  readCatalogLocal,
-  setPending,
-  takePending,
-  toggleFavorite,
-} from "@/lib/catalog-demo-repository";
+import { FavoriteToggle } from "@/components/favorite-action";
 import type { ListingView } from "@/lib/listing-view";
 
 const compareLimit = 3;
@@ -20,30 +15,33 @@ export function CatalogGrid({
   signInUrl,
 }: {
   listings: ListingView[];
-  userId: string | null;
-  signInUrl: string;
+  userId?: string | null;
+  signInUrl?: string;
 }) {
-  const [favorites, setFavorites] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [favoriteBusy, setFavoriteBusy] = useState<string | null>(null);
+  const [favoriteError, setFavoriteError] = useState("");
 
   useEffect(() => {
     if (!userId) return;
-    const timer = window.setTimeout(() => {
-      const pending = takePending("favorite");
-      if (
-        pending?.kind === "favorite" &&
-        !readCatalogLocal(userId).favorites.includes(pending.id)
-      ) {
-        const result = toggleFavorite(userId, pending.id);
-        setMessage(
-          result ? "Publicación guardada en este navegador." : "No pudimos guardar la publicación.",
-        );
-      }
-      setFavorites(readCatalogLocal(userId).favorites);
-    }, 0);
-    return () => window.clearTimeout(timer);
+    let active = true;
+    fetch("/api/favoritos", { credentials: "same-origin" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("No pudimos cargar tus guardados.");
+        return (await response.json()) as { ids: string[] };
+      })
+      .then(({ ids }) => {
+        if (active) setFavorites(new Set(ids));
+      })
+      .catch(() => {
+        if (active) setFavoriteError("No pudimos cargar tus guardados.");
+      });
+    return () => {
+      active = false;
+    };
   }, [userId]);
 
   const picks = listings.filter((listing) => selected.includes(listing.id));
@@ -63,19 +61,29 @@ export function CatalogGrid({
     });
   }
 
-  function favorite(id: string) {
-    if (!userId) return;
-    const result = toggleFavorite(userId, id);
-    if (!result) {
-      setMessage("No pudimos guardar la publicación.");
-      return;
+  async function toggleFavorite(id: string) {
+    const saved = favorites.has(id);
+    setFavoriteBusy(id);
+    setFavoriteError("");
+    try {
+      const response = await fetch("/api/favoritos", {
+        method: saved ? "DELETE" : "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ equipmentId: id }),
+      });
+      if (!response.ok) throw new Error("No pudimos actualizar tus guardados.");
+      setFavorites((current) => {
+        const next = new Set(current);
+        if (saved) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    } catch {
+      setFavoriteError("No pudimos actualizar tus guardados. Inténtalo de nuevo.");
+    } finally {
+      setFavoriteBusy(null);
     }
-    setFavorites(result.favorites);
-    setMessage(
-      result.saved
-        ? "Publicación guardada en este navegador."
-        : "Publicación eliminada de favoritos.",
-    );
   }
 
   return (
@@ -86,7 +94,7 @@ export function CatalogGrid({
             key={listing.id}
             listing={listing}
             actions={
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   aria-pressed={selected.includes(listing.id)}
@@ -101,44 +109,31 @@ export function CatalogGrid({
                   <GitCompareArrows size={15} />
                   {selected.includes(listing.id) ? "Seleccionado" : "Comparar"}
                 </button>
-                <div className="flex items-center gap-2">
-                  {listing.esEjemplo ? null : userId ? (
-                    <button
-                      type="button"
-                      aria-pressed={favorites.includes(listing.id)}
-                      aria-label={
-                        favorites.includes(listing.id)
-                          ? "Quitar de favoritos"
-                          : "Guardar en favoritos"
-                      }
-                      onClick={() => favorite(listing.id)}
-                      className="rounded-xl border border-[#5a6959] p-2 text-[#c6d2c1] hover:border-[#b9d88b]"
-                    >
-                      <Heart
-                        size={16}
-                        fill={favorites.includes(listing.id) ? "currentColor" : "none"}
-                      />
-                    </button>
-                  ) : (
-                    <a
-                      href={signInUrl}
-                      target="_top"
-                      onClick={() => setPending({ kind: "favorite", id: listing.id })}
-                      aria-label="Ingresar para guardar en favoritos"
-                      className="rounded-xl border border-[#5a6959] p-2 text-[#c6d2c1]"
-                    >
-                      <Heart size={16} />
-                    </a>
-                  )}
-                  {listing.href && (
-                    <Link
-                      href={listing.href}
-                      className="text-xs font-bold text-[#d4e5c5] hover:text-white"
-                    >
-                      Ver ficha ↗
-                    </Link>
-                  )}
-                </div>
+                {userId ? (
+                  <FavoriteToggle
+                    saved={favorites.has(listing.id)}
+                    busy={favoriteBusy === listing.id}
+                    onClick={() => void toggleFavorite(listing.id)}
+                    compact
+                  />
+                ) : (
+                  <Link
+                    href={signInUrl || "/ingresar?return_to=%2Fmaquinaria"}
+                    aria-label="Ingresa para guardar maquinaria"
+                    title="Ingresa para guardar"
+                    className="inline-flex min-h-10 items-center rounded-xl border border-[#647761] px-3 py-2 text-[#d5e4cc] hover:border-[#b9d88b]"
+                  >
+                    <Bookmark size={16} />
+                  </Link>
+                )}
+                {listing.href && (
+                  <Link
+                    href={listing.href}
+                    className="ml-auto text-xs font-bold text-[#d4e5c5] hover:text-white"
+                  >
+                    Ver ficha ↗
+                  </Link>
+                )}
               </div>
             }
           />
@@ -147,6 +142,11 @@ export function CatalogGrid({
       {message && (
         <p role="status" className="mt-4 text-sm text-[#d4e3cb]">
           {message}
+        </p>
+      )}
+      {favoriteError && (
+        <p role="alert" className="mt-4 text-sm text-[#edb6a6]">
+          {favoriteError}
         </p>
       )}
       {picks.length > 0 && (

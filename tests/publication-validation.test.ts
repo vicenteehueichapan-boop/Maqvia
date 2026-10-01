@@ -110,6 +110,22 @@ test("publicación valida título y WhatsApp en el mismo esquema del servidor", 
   assert.equal(publicationSchema.safeParse({ ...base, title: "abc" }).success, false);
   assert.equal(publicationSchema.safeParse({ ...base, whatsapp: "123" }).success, false);
   assert.equal(
+    publicationSchema.safeParse({ ...base, emailContactEnabled: "yes", contactEmail: "" }).success,
+    false,
+  );
+  assert.equal(
+    publicationSchema.safeParse({
+      ...base,
+      emailContactEnabled: "yes",
+      contactEmail: "contacto@empresa.cl",
+    }).success,
+    true,
+  );
+  assert.equal(
+    publicationSchema.safeParse({ ...base, emailContactEnabled: "no", contactEmail: "" }).success,
+    true,
+  );
+  assert.equal(
     publicationSchema.safeParse({
       ...base,
       serviceOffers: '[{"name":"Traslado","kind":"from"}]',

@@ -2,10 +2,11 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { HeroCarousel } from "@/components/hero-carousel";
-import { HomeExperience } from "@/components/home-experience";
 import { HomeEditorial } from "@/components/home-editorial";
-import { ProfileAssistantV2 } from "@/components/profile-assistant-v2";
+import { MarketPulse } from "@/components/market-pulse";
+
 export const dynamic = "force-dynamic";
+
 const paths = [
   {
     href: "/maquinaria",
@@ -26,6 +27,7 @@ const paths = [
     action: "Crear mi vitrina",
   },
 ];
+
 export default function Home() {
   return (
     <main className="min-h-screen overflow-x-clip">
@@ -86,9 +88,10 @@ export default function Home() {
           </p>
         </div>
       </section>
+
+      <MarketPulse />
+
       <HomeEditorial />
-      <HomeExperience />
-      <ProfileAssistantV2 />
       <SiteFooter />
     </main>
   );

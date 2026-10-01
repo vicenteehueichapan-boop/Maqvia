@@ -80,7 +80,11 @@ export function ListingDetail({
         <h1 className="display mt-4 text-[clamp(2.7rem,5vw,4.7rem)]">{listing.title}</h1>
         <p className="mt-5 inline-flex items-center gap-2 text-sm text-[#bac7b6]">
           <MapPin size={17} />
-          {listing.comuna === "Santiago" ? "Santiago" : `${listing.comuna}, Santiago`}
+          {listing.comuna
+            ? listing.comuna === "Santiago"
+              ? "Santiago"
+              : `${listing.comuna}, Santiago`
+            : "Comuna por definir"}
         </p>
         <div className="mt-7 border-y border-[#3e4b3f] py-5">
           <span className="text-xs text-[#a9b8a7]">Condición de arriendo</span>

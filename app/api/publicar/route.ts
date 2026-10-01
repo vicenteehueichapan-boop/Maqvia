@@ -6,13 +6,14 @@ import { findProviderByOwner } from "@/lib/marketplace";
 import { eq } from "drizzle-orm";
 import { publicationSchema } from "@/lib/publication-validation";
 import { normalizeChileanWhatsApp } from "@/lib/contact-inquiry";
-import { parseServiceOffers } from "@/lib/service-offers";
-
-function val(form: FormData, key: string, max: number) {
-  return String(form.get(key) || "")
-    .trim()
-    .slice(0, max);
-}
+import {
+  equipmentFields,
+  imageTypes,
+  invalidPublicationImage,
+  providerFields,
+  publicationUploads,
+  readPublicationForm,
+} from "@/lib/server/publication-payload";
 function slugify(s: string) {
   return (
     s
@@ -27,124 +28,72 @@ function slugify(s: string) {
 export async function POST(request: Request) {
   const user = await getChatGPTUser();
   if (!user) return Response.json({ error: "Inicia sesión para publicar." }, { status: 401 });
+  const uploadedKeys: string[] = [];
   try {
     const form = await request.formData();
-    const name = val(form, "name", 90),
-      description = val(form, "description", 600),
-      comuna = val(form, "comuna", 80),
-      phone = val(form, "whatsapp", 30),
-      title = val(form, "title", 100),
-      category = val(form, "category", 70),
-      details = val(form, "details", 800);
-    const parsed = publicationSchema.safeParse({
-      name,
-      description,
-      comuna,
-      whatsapp: phone,
-      title,
-      category,
-      details,
-      operator: form.get("operator"),
-      delivery: form.get("delivery"),
-      priceKind: val(form, "priceKind", 10) || undefined,
-      priceAmount: val(form, "priceAmount", 10),
-      priceUnit: val(form, "priceUnit", 10) || undefined,
-      services: val(form, "services", 300),
-      serviceOffers: val(form, "serviceOffers", 700),
-      sector: val(form, "sector", 80),
-      locationPrecision: val(form, "locationPrecision", 10) || undefined,
-      presentationVariant: val(form, "presentationVariant", 10) || undefined,
-    });
+    const parsed = publicationSchema.safeParse(readPublicationForm(form));
     if (!parsed.success)
       return Response.json(
         { error: parsed.error.issues[0]?.message || "Revisa los datos de la publicación." },
         { status: 400 },
       );
-    const cleanPhone = normalizeChileanWhatsApp(phone);
+    const cleanPhone = normalizeChileanWhatsApp(parsed.data.whatsapp);
     if (!cleanPhone)
       return Response.json({ error: "Ingresa un WhatsApp chileno válido." }, { status: 400 });
-    const uploads = form.getAll("images").filter((x): x is File => x instanceof File && x.size > 0);
+    const uploads = publicationUploads(form);
     if (uploads.length < 1 || uploads.length > 4)
       return Response.json({ error: "Sube entre 1 y 4 fotos de la máquina." }, { status: 400 });
-    const types: Record<string, string> = {
-      "image/jpeg": "jpg",
-      "image/png": "png",
-      "image/webp": "webp",
-    };
-    for (const file of uploads) {
-      if (!types[file.type] || file.size > 5_000_000)
-        return Response.json(
-          { error: "Las fotos deben ser JPG, PNG o WebP y pesar menos de 5 MB cada una." },
-          { status: 400 },
-        );
-    }
+    if (invalidPublicationImage(uploads))
+      return Response.json(
+        { error: "Las fotos deben ser JPG, PNG o WebP y pesar menos de 5 MB cada una." },
+        { status: 400 },
+      );
     if (!env.BUCKET)
       return Response.json(
         { error: "El almacenamiento de imágenes no está disponible." },
         { status: 503 },
       );
-    const keys: string[] = [];
     for (const file of uploads) {
-      const key = crypto.randomUUID() + "." + types[file.type];
+      const key = crypto.randomUUID() + "." + imageTypes[file.type];
       await env.BUCKET.put(key, file.stream(), { httpMetadata: { contentType: file.type } });
-      keys.push(key);
+      uploadedKeys.push(key);
     }
     const now = new Date().toISOString();
     const db = getDb();
-    let provider = await findProviderByOwner(user.userId);
-    if (provider) {
-      await db
-        .update(providers)
-        .set({ name, description, comuna, whatsapp: cleanPhone, updatedAt: now })
-        .where(eq(providers.id, provider.id));
-    } else {
-      const id = crypto.randomUUID();
-      const slug = slugify(name) + "-" + id.slice(0, 6);
-      provider = {
-        id,
-        ownerId: user.userId,
-        slug,
-        name,
-        description,
-        comuna,
-        whatsapp: cleanPhone,
-        createdAt: now,
-        updatedAt: now,
-      };
-      await db.insert(providers).values(provider);
-    }
+    const existingProvider = await findProviderByOwner(user.userId);
+    const id = crypto.randomUUID();
+    const provider = existingProvider ?? {
+      id,
+      ownerId: user.userId,
+      slug: slugify(parsed.data.name) + "-" + id.slice(0, 6),
+      ...providerFields(parsed.data, cleanPhone, now),
+      createdAt: now,
+    };
+    const providerWrite = existingProvider
+      ? db
+          .update(providers)
+          .set(providerFields(parsed.data, cleanPhone, now))
+          .where(eq(providers.id, existingProvider.id))
+      : db.insert(providers).values(provider);
     const itemId = crypto.randomUUID();
-    await db.insert(equipment).values({
+    const equipmentWrite = db.insert(equipment).values({
       id: itemId,
       providerId: provider.id,
-      title,
-      category,
-      description: details,
-      images: JSON.stringify(keys),
-      operator: parsed.data.operator,
-      delivery: parsed.data.delivery,
-      priceKind: parsed.data.priceKind,
-      priceAmount: parsed.data.priceKind === "consult" ? null : Number(parsed.data.priceAmount),
-      priceUnit: parsed.data.priceUnit,
-      services: JSON.stringify([
-        ...parsed.data.services
-          .split(",")
-          .map((value) => value.trim())
-          .filter(Boolean)
-          .slice(0, 8),
-        ...(parseServiceOffers(parsed.data.serviceOffers) || []),
-      ]),
-      sector: parsed.data.sector,
-      locationPrecision: parsed.data.locationPrecision,
-      presentationVariant: parsed.data.presentationVariant,
+      ...equipmentFields(parsed.data, uploadedKeys),
       createdAt: now,
     });
+    await db.batch([providerWrite, equipmentWrite]);
     return Response.json(
       { url: "/proveedores/" + provider.slug, itemUrl: "/maquinaria/" + itemId },
       { status: 201 },
     );
   } catch (error) {
     console.error("publish_error", error);
+    if (uploadedKeys.length) {
+      const cleanup = await Promise.allSettled(uploadedKeys.map((key) => env.BUCKET!.delete(key)));
+      if (cleanup.some((result) => result.status === "rejected"))
+        console.error("publish_image_cleanup_error", cleanup);
+    }
     return Response.json(
       { error: "No pudimos guardar la publicación. Inténtalo nuevamente." },
       { status: 500 },

@@ -1,0 +1,1 @@
+ALTER TABLE `providers` ADD `contact_email` text DEFAULT '' NOT NULL;

@@ -14,6 +14,7 @@ export default async function ContactEquipment({ params }: { params: Promise<{ i
       name={item.name}
       subject={item.title}
       phone={item.whatsapp}
+      email={item.contactEmail}
     />
   );
 }

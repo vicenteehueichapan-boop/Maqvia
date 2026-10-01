@@ -29,7 +29,7 @@ export function HeroCarousel() {
   }, []);
   return (
     <section
-      aria-label="Inicio de Maquinal"
+      aria-label="Inicio de Maqvia"
       className="relative isolate min-h-[760px] md:min-h-[720px] flex items-center overflow-hidden bg-[#121714]"
     >
       <div className="absolute inset-0 -z-20">
@@ -51,7 +51,7 @@ export function HeroCarousel() {
       </div>
       <div className="hero-scrim absolute inset-0 -z-10" />
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#101313] to-transparent -z-10" />
-      <div className="container-shell relative z-10 pt-16 pb-40 md:py-24">
+      <div className="container-shell relative z-10 pt-28 pb-40 md:py-24">
         <div className="max-w-[700px]">
           <p className="text-xs font-bold tracking-[.15em] uppercase text-[#c6d7b3]">
             Arriendo de maquinaria · Santiago
@@ -64,7 +64,7 @@ export function HeroCarousel() {
             proveedor.
           </p>
           <form
-            action="/maquinaria"
+            action="/maquinaria#resultados"
             method="get"
             onSubmit={(event) => {
               event.preventDefault();
@@ -73,7 +73,7 @@ export function HeroCarousel() {
                 q: String(fields.get("q") || "").trim(),
                 comuna: String(fields.get("comuna") || ""),
               });
-              router.push(`/maquinaria?${params}`);
+              router.push(`/maquinaria?${params}#resultados`);
             }}
             className="mt-9 max-w-[720px] rounded-2xl border border-[#87918772] bg-[#151c1a]/95 backdrop-blur-xl p-2 grid sm:grid-cols-[1fr_185px_auto] gap-1 shadow-[0_20px_70px_#0008]"
           >

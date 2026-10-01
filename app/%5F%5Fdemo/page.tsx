@@ -11,7 +11,7 @@ export default function DemoLab() {
     <main>
       <section className="container-shell py-14">
         <p className="eyebrow">Laboratorio visual · contenido ficticio</p>
-        <h1 className="display mt-4 text-[clamp(3rem,5vw,5rem)]">Escenarios de Maquinal.</h1>
+        <h1 className="display mt-4 text-[clamp(3rem,5vw,5rem)]">Escenarios de Maqvia.</h1>
         <p className="muted-copy mt-5 max-w-2xl">
           Prueba perfiles completos y mínimos, fotos, precios, ubicación y contacto sin enviar
           mensajes reales.

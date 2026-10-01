@@ -32,8 +32,7 @@ export function LocationPanel({ listing }: { listing: ListingView }) {
         <MapPin size={25} className="shrink-0 text-[#b9d88b]" />
         <p className="text-sm text-[#d8e4d3]">
           {listing.sector || listing.comuna}
-          <br />
-          <span className="text-xs text-[#a9b8a6]">
+          <span className="mt-1 block text-xs text-[#a9b8a6]">
             {listing.location === "approx"
               ? "Sector referencial; solicita la ubicación al proveedor."
               : "Punto público ficticio para visualizar cómo se mostraría un mapa autorizado."}
