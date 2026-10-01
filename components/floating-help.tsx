@@ -16,7 +16,7 @@ export function FloatingHelp() {
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-50 transition-all duration-500 ${
+      className={`fixed bottom-6 right-6 z-50 hidden md:block transition-all duration-500 ${
         show ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0 pointer-events-none"
       }`}
     >

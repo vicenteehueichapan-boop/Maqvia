@@ -4,6 +4,8 @@ Marketplace de arriendo de maquinaria para Santiago de Chile. El código se abre
 
 ## Producto local
 
+- `/novedades` contiene el archivo editorial y `/novedades/:slug` abre cada artículo completo. El inicio muestra hasta seis entradas recientes, tres por vista en escritorio y una por vista en móvil, con desplazamiento manual. `lib/editorial.ts` mantiene el contenido validado; solo se muestran publicados cuya fecha haya llegado. Las noticias requieren fuentes HTTPS. Véase `docs/editorial.md` para el proceso semanal y sus límites.
+
 - `npm install` instala las dependencias.
 - `npm run dev` abre el sitio local en `http://localhost:5173`.
 - `npm run format:check`, `npm run lint`, `npx tsc --noEmit`, `npm test` y `npm run build` comprueban la entrega.

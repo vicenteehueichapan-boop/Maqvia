@@ -13,6 +13,9 @@ export function SiteFooter() {
             </p>
           </div>
           <div className="flex flex-wrap gap-x-9 gap-y-4 text-sm text-[#c0c8bd]">
+            <Link href="/novedades" className="hover:text-[#b9d88b]">
+              Novedades y guías
+            </Link>
             <Link href="/maquinaria" className="hover:text-[#b9d88b]">
               Explorar
             </Link>
